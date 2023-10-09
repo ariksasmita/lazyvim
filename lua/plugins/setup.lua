@@ -4,7 +4,7 @@ return {
 
   -- Config Lazyvim to load moonfly
   {
-    "LazyVim/LaxyVim",
+    "LazyVim/LazyVim",
     opts = {
       colorscheme = "moonfly",
     },
