@@ -57,4 +57,4 @@ local function get_folder_and_live_grep()
   end)
 end
 
-keymap.set("n", "<leader>gs", get_folder_and_live_grep, { desc = "Grep in folder" })
+keymap.set("n", "<leader>fG", get_folder_and_live_grep, { desc = "Grep in folder" })
