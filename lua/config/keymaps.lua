@@ -12,11 +12,11 @@ keymap.set("n", "<S-Tab>", ":bprev!<CR>") -- go to prev buffer
 -- Terminal actions
 -- Vertical open / toggle terminal
 keymap.set("n", "<leader>tv", function()
-  require("lazyvim.util").terminal(nil, { win = { position = "right" }})
+  require("snacks.terminal")(nil, { win = { position = "right" }})
 end, { desc = "Terminal vertical split" })
 -- Horizontal open / toggle terminal
 vim.keymap.set("n", "<leader>th", function()
-  require("lazyvim.util").terminal(nil, { win = { position = "bottom" }})
+  require("snacks.terminal")(nil, { win = { position = "bottom" }})
 end, { desc = "Terminal horizontal split" })
 -- Terminal selector
 vim.keymap.set("n", "<leader>ts", "<cmd>TermSelect<cr>", { desc = "Select terminal" })
