@@ -3,10 +3,10 @@ return {
   { "bluz71/vim-moonfly-colors", name = "moonfly", lazy = false, priority = 1000 },
 
   -- Make lazy use moonfly
-  {
-    "LazyVim/LazyVim",
-    opts = {
+  -- {
+  --   "LazyVim/LazyVim",
+  --   opts = {
       -- colorscheme = "moonfly",
-    },
-  },
+  --   },
+  -- },
 }

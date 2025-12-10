@@ -1,14 +1,8 @@
 return {
   -- add moonfly
-  { "bluz71/vim-moonfly-colors" },
+  -- { "bluz71/vim-moonfly-colors" },
 
-  -- Config Lazyvim to load moonfly
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "moonfly",
-    },
-  },
+
 
   -- nvim-navic for breadcrumbs
   {
