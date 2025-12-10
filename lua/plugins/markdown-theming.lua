@@ -4,7 +4,7 @@
 -- files by returning an empty table at the end.
 
 local default_theme = "github_dark_high_contrast"
-local markdown_theme = "github_light_default"
+local markdown_theme = "github_light_high_contrast"
 
 -- Helper function to apply a colorscheme if it's not already active
 local function apply_colorscheme(theme)
