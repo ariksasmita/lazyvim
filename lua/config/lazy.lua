@@ -18,8 +18,11 @@ require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+    -- Use this import to do overall without separating main and note related plugins
+    -- { import = "plugins" },
     -- import/override with your plugins
-    { import = "plugins" },
+    { import = "plugins.base" },
+    { import = "plugins.notes_profile" },
   },
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
