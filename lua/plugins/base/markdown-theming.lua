@@ -3,8 +3,9 @@
 -- based on whether the current file is within the dedicated Markdown notes folder.
 
 local default_theme = "moonfly"
-local markdown_theme = "tokyonight-day" -- User's chosen Markdown theme
-local markdown_base_path = vim.fn.expand("~/Documents/mds") -- User's dedicated Markdown folder
+local markdown_theme = "tokyonight-night" -- User's chosen Markdown theme
+local markdown_base_path = vim.fn.expand("~/Library/CloudStorage/OneDrive-DANAINDONESIA/notevault") -- User's dedicated Markdown folder
+
 
 -- Helper function to apply a colorscheme if it's not already active
 local function apply_colorscheme(theme)

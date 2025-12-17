@@ -1,0 +1,936 @@
+
+==============================================================================
+vim.lsp:                                                                    ✅
+
+- LSP log level : WARN
+- Log path: /Users/sasmitai/.local/state/nvim/lsp.log
+- Log size: 378 KB
+
+vim.lsp: Active Clients ~
+- copilot (id: 1)
+  - Version: 1.400.0
+  - Root directory: ~/Documents/mds
+  - Command: { "node", "/Users/sasmitai/.local/share/nvim/lazy/copilot.lua/copilot/js/language-server.js", "--stdio" }
+  - Settings: {
+      telemetry = {
+        telemetryLevel = "all"
+      }
+    }
+  - Attached buffers: 6
+
+vim.lsp: Enabled Configurations ~
+- biome:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = false,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            insertTextModeSupport = {
+              valueSet = { 1 }
+            },
+            labelDetailsSupport = true,
+            preselectSupport = false,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits", "command", "data" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          insertTextMode = 1
+        }
+      },
+      workspace = {
+        fileOperations = {
+          didRename = true,
+          willRename = true
+        }
+      }
+    }
+  - cmd: <function @/Users/sasmitai/.local/share/nvim/lazy/nvim-lspconfig/lsp/biome.lua:18>
+  - filetypes: astro, css, graphql, html, javascript, javascriptreact, json, jsonc, svelte, typescript, typescript.tsx, typescriptreact, vue
+  - keys: { { "<leader>cl", <function 1>,
+        desc = "Lsp Info",
+        mode = "n"
+      }, { "gd", <function 2>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 3>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 4>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 5>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "gD", <function 6>,
+        desc = "Goto Declaration",
+        mode = "n"
+      }, { "K", <function 7>,
+        desc = "Hover",
+        mode = "n"
+      }, { "gK", <function 8>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "n"
+      }, { "<c-k>", <function 9>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "i"
+      }, { "<leader>ca", <function 10>,
+        desc = "Code Action",
+        has = "codeAction",
+        mode = { "n", "x" }
+      }, { "<leader>cc", <function 11>,
+        desc = "Run Codelens",
+        has = "codeLens",
+        mode = { "n", "x" }
+      }, { "<leader>cC", <function 12>,
+        desc = "Refresh & Display Codelens",
+        has = "codeLens",
+        mode = { "n" }
+      }, { "<leader>cR", <function 13>,
+        desc = "Rename File",
+        has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
+        mode = { "n" }
+      }, { "<leader>cr", <function 14>,
+        desc = "Rename",
+        has = "rename",
+        mode = "n"
+      }, { "<leader>cA", <function 15>,
+        desc = "Source Action",
+        has = "codeAction",
+        mode = "n"
+      }, { "]]", <function 16>,
+        desc = "Next Reference",
+        enabled = <function 17>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "[[", <function 18>,
+        desc = "Prev Reference",
+        enabled = <function 19>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-n>", <function 20>,
+        desc = "Next Reference",
+        enabled = <function 21>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-p>", <function 22>,
+        desc = "Prev Reference",
+        enabled = <function 23>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "gd", <function 24>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 25>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 26>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 27>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "<leader>ss", <function 28>,
+        desc = "LSP Symbols",
+        has = "documentSymbol",
+        mode = "n"
+      }, { "<leader>sS", <function 29>,
+        desc = "LSP Workspace Symbols",
+        has = "workspace/symbols",
+        mode = "n"
+      }, { "gai", <function 30>,
+        desc = "C[a]lls Incoming",
+        has = "callHierarchy/incomingCalls",
+        mode = "n"
+      }, { "gao", <function 31>,
+        desc = "C[a]lls Outgoing",
+        has = "callHierarchy/outgoingCalls",
+        mode = "n"
+      } }
+  - root_dir: <function @/Users/sasmitai/.local/share/nvim/lazy/nvim-lspconfig/lsp/biome.lua:42>
+  - workspace_required: true
+
+- lua_ls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = false,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            insertTextModeSupport = {
+              valueSet = { 1 }
+            },
+            labelDetailsSupport = true,
+            preselectSupport = false,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits", "command", "data" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          insertTextMode = 1
+        }
+      },
+      workspace = {
+        fileOperations = {
+          didRename = true,
+          willRename = true
+        }
+      }
+    }
+  - cmd: { "lua-language-server" }
+  - filetypes: lua
+  - keys: { { "<leader>cl", <function 1>,
+        desc = "Lsp Info",
+        mode = "n"
+      }, { "gd", <function 2>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 3>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 4>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 5>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "gD", <function 6>,
+        desc = "Goto Declaration",
+        mode = "n"
+      }, { "K", <function 7>,
+        desc = "Hover",
+        mode = "n"
+      }, { "gK", <function 8>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "n"
+      }, { "<c-k>", <function 9>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "i"
+      }, { "<leader>ca", <function 10>,
+        desc = "Code Action",
+        has = "codeAction",
+        mode = { "n", "x" }
+      }, { "<leader>cc", <function 11>,
+        desc = "Run Codelens",
+        has = "codeLens",
+        mode = { "n", "x" }
+      }, { "<leader>cC", <function 12>,
+        desc = "Refresh & Display Codelens",
+        has = "codeLens",
+        mode = { "n" }
+      }, { "<leader>cR", <function 13>,
+        desc = "Rename File",
+        has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
+        mode = { "n" }
+      }, { "<leader>cr", <function 14>,
+        desc = "Rename",
+        has = "rename",
+        mode = "n"
+      }, { "<leader>cA", <function 15>,
+        desc = "Source Action",
+        has = "codeAction",
+        mode = "n"
+      }, { "]]", <function 16>,
+        desc = "Next Reference",
+        enabled = <function 17>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "[[", <function 18>,
+        desc = "Prev Reference",
+        enabled = <function 19>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-n>", <function 20>,
+        desc = "Next Reference",
+        enabled = <function 21>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-p>", <function 22>,
+        desc = "Prev Reference",
+        enabled = <function 23>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "gd", <function 24>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 25>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 26>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 27>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "<leader>ss", <function 28>,
+        desc = "LSP Symbols",
+        has = "documentSymbol",
+        mode = "n"
+      }, { "<leader>sS", <function 29>,
+        desc = "LSP Workspace Symbols",
+        has = "workspace/symbols",
+        mode = "n"
+      }, { "gai", <function 30>,
+        desc = "C[a]lls Incoming",
+        has = "callHierarchy/incomingCalls",
+        mode = "n"
+      }, { "gao", <function 31>,
+        desc = "C[a]lls Outgoing",
+        has = "callHierarchy/outgoingCalls",
+        mode = "n"
+      } }
+  - root_markers: { ".emmyrc.json", ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" }
+  - settings: {
+      Lua = {
+        codeLens = {
+          enable = true
+        },
+        completion = {
+          callSnippet = "Replace"
+        },
+        doc = {
+          privateName = { "^_" }
+        },
+        hint = {
+          arrayIndex = "Disable",
+          enable = true,
+          paramName = "Disable",
+          paramType = true,
+          semicolon = "Disable",
+          setType = false
+        },
+        workspace = {
+          checkThirdParty = false
+        }
+      }
+    }
+
+- marksman:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = false,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            insertTextModeSupport = {
+              valueSet = { 1 }
+            },
+            labelDetailsSupport = true,
+            preselectSupport = false,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits", "command", "data" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          insertTextMode = 1
+        }
+      },
+      workspace = {
+        fileOperations = {
+          didRename = true,
+          willRename = true
+        }
+      }
+    }
+  - cmd: { "marksman", "server" }
+  - filetypes: markdown, markdown.mdx
+  - keys: { { "<leader>cl", <function 1>,
+        desc = "Lsp Info",
+        mode = "n"
+      }, { "gd", <function 2>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 3>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 4>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 5>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "gD", <function 6>,
+        desc = "Goto Declaration",
+        mode = "n"
+      }, { "K", <function 7>,
+        desc = "Hover",
+        mode = "n"
+      }, { "gK", <function 8>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "n"
+      }, { "<c-k>", <function 9>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "i"
+      }, { "<leader>ca", <function 10>,
+        desc = "Code Action",
+        has = "codeAction",
+        mode = { "n", "x" }
+      }, { "<leader>cc", <function 11>,
+        desc = "Run Codelens",
+        has = "codeLens",
+        mode = { "n", "x" }
+      }, { "<leader>cC", <function 12>,
+        desc = "Refresh & Display Codelens",
+        has = "codeLens",
+        mode = { "n" }
+      }, { "<leader>cR", <function 13>,
+        desc = "Rename File",
+        has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
+        mode = { "n" }
+      }, { "<leader>cr", <function 14>,
+        desc = "Rename",
+        has = "rename",
+        mode = "n"
+      }, { "<leader>cA", <function 15>,
+        desc = "Source Action",
+        has = "codeAction",
+        mode = "n"
+      }, { "]]", <function 16>,
+        desc = "Next Reference",
+        enabled = <function 17>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "[[", <function 18>,
+        desc = "Prev Reference",
+        enabled = <function 19>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-n>", <function 20>,
+        desc = "Next Reference",
+        enabled = <function 21>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-p>", <function 22>,
+        desc = "Prev Reference",
+        enabled = <function 23>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "gd", <function 24>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 25>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 26>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 27>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "<leader>ss", <function 28>,
+        desc = "LSP Symbols",
+        has = "documentSymbol",
+        mode = "n"
+      }, { "<leader>sS", <function 29>,
+        desc = "LSP Workspace Symbols",
+        has = "workspace/symbols",
+        mode = "n"
+      }, { "gai", <function 30>,
+        desc = "C[a]lls Incoming",
+        has = "callHierarchy/incomingCalls",
+        mode = "n"
+      }, { "gao", <function 31>,
+        desc = "C[a]lls Outgoing",
+        has = "callHierarchy/outgoingCalls",
+        mode = "n"
+      } }
+  - root_dir: <function @/Users/sasmitai/.config/nvim/lua/plugins/notes_profile/lsp-marksman.lua:21>
+  - root_markers: { ".marksman.toml", ".git" }
+
+- tailwindcss:
+  - before_init: <function @/Users/sasmitai/.local/share/nvim/lazy/nvim-lspconfig/lsp/tailwindcss.lua:105>
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = false,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            insertTextModeSupport = {
+              valueSet = { 1 }
+            },
+            labelDetailsSupport = true,
+            preselectSupport = false,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits", "command", "data" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          insertTextMode = 1
+        }
+      },
+      workspace = {
+        didChangeWatchedFiles = {
+          dynamicRegistration = true
+        },
+        fileOperations = {
+          didRename = true,
+          willRename = true
+        }
+      }
+    }
+  - cmd: { "tailwindcss-language-server", "--stdio" }
+  - filetypes: aspnetcorerazor, astro, astro-markdown, blade, clojure, django-html, htmldjango, edge, eelixir, elixir, ejs, erb, eruby, gohtml, gohtmltmpl, haml, handlebars, hbs, html, htmlangular, html-eex, heex, jade, leaf, liquid, mdx, mustache, njk, nunjucks, php, razor, slim, twig, css, less, postcss, sass, scss, stylus, sugarss, javascript, javascriptreact, reason, rescript, typescript, typescriptreact, vue, svelte, templ
+  - filetypes_exclude: { "markdown" }
+  - filetypes_include: {}
+  - keys: { { "<leader>cl", <function 1>,
+        desc = "Lsp Info",
+        mode = "n"
+      }, { "gd", <function 2>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 3>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 4>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 5>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "gD", <function 6>,
+        desc = "Goto Declaration",
+        mode = "n"
+      }, { "K", <function 7>,
+        desc = "Hover",
+        mode = "n"
+      }, { "gK", <function 8>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "n"
+      }, { "<c-k>", <function 9>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "i"
+      }, { "<leader>ca", <function 10>,
+        desc = "Code Action",
+        has = "codeAction",
+        mode = { "n", "x" }
+      }, { "<leader>cc", <function 11>,
+        desc = "Run Codelens",
+        has = "codeLens",
+        mode = { "n", "x" }
+      }, { "<leader>cC", <function 12>,
+        desc = "Refresh & Display Codelens",
+        has = "codeLens",
+        mode = { "n" }
+      }, { "<leader>cR", <function 13>,
+        desc = "Rename File",
+        has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
+        mode = { "n" }
+      }, { "<leader>cr", <function 14>,
+        desc = "Rename",
+        has = "rename",
+        mode = "n"
+      }, { "<leader>cA", <function 15>,
+        desc = "Source Action",
+        has = "codeAction",
+        mode = "n"
+      }, { "]]", <function 16>,
+        desc = "Next Reference",
+        enabled = <function 17>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "[[", <function 18>,
+        desc = "Prev Reference",
+        enabled = <function 19>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-n>", <function 20>,
+        desc = "Next Reference",
+        enabled = <function 21>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-p>", <function 22>,
+        desc = "Prev Reference",
+        enabled = <function 23>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "gd", <function 24>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 25>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 26>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 27>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "<leader>ss", <function 28>,
+        desc = "LSP Symbols",
+        has = "documentSymbol",
+        mode = "n"
+      }, { "<leader>sS", <function 29>,
+        desc = "LSP Workspace Symbols",
+        has = "workspace/symbols",
+        mode = "n"
+      }, { "gai", <function 30>,
+        desc = "C[a]lls Incoming",
+        has = "callHierarchy/incomingCalls",
+        mode = "n"
+      }, { "gao", <function 31>,
+        desc = "C[a]lls Outgoing",
+        has = "callHierarchy/outgoingCalls",
+        mode = "n"
+      } }
+  - root_dir: <function @/Users/sasmitai/.local/share/nvim/lazy/nvim-lspconfig/lsp/tailwindcss.lua:117>
+  - settings: {
+      tailwindCSS = {
+        classAttributes = { "class", "className", "class:list", "classList", "ngClass" },
+        includeLanguages = {
+          eelixir = "html-eex",
+          elixir = "html-eex",
+          eruby = "erb",
+          heex = "html-eex",
+          htmlangular = "html",
+          templ = "html"
+        },
+        lint = {
+          cssConflict = "warning",
+          invalidApply = "error",
+          invalidConfigPath = "error",
+          invalidScreen = "error",
+          invalidTailwindDirective = "error",
+          invalidVariant = "error",
+          recommendedVariantOrder = "warning"
+        },
+        validate = true
+      }
+    }
+  - workspace_required: true
+
+- vtsls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = false,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            insertTextModeSupport = {
+              valueSet = { 1 }
+            },
+            labelDetailsSupport = true,
+            preselectSupport = false,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits", "command", "data" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          insertTextMode = 1
+        }
+      },
+      workspace = {
+        fileOperations = {
+          didRename = true,
+          willRename = true
+        }
+      }
+    }
+  - cmd: { "vtsls", "--stdio" }
+  - filetypes: javascript, javascriptreact, javascript.jsx, typescript, typescriptreact, typescript.tsx, vue
+  - init_options: {
+      hostInfo = "neovim"
+    }
+  - keys: { { "gD", <function 1>,
+        desc = "Goto Source Definition",
+        mode = "n"
+      }, { "gR", <function 2>,
+        desc = "File References",
+        mode = "n"
+      }, { "<leader>co", <function 3>,
+        desc = "Organize Imports",
+        mode = "n"
+      }, { "<leader>cM", <function 4>,
+        desc = "Add missing imports",
+        mode = "n"
+      }, { "<leader>cu", <function 5>,
+        desc = "Remove unused imports",
+        mode = "n"
+      }, { "<leader>cD", <function 6>,
+        desc = "Fix all diagnostics",
+        mode = "n"
+      }, { "<leader>cV", <function 7>,
+        desc = "Select TS workspace version",
+        mode = "n"
+      } }
+  - root_dir: <function @/Users/sasmitai/.local/share/nvim/lazy/LazyVim/lua/lazyvim/plugins/extras/lang/typescript.lua:140>
+  - settings: {
+      complete_function_calls = true,
+      javascript = {
+        inlayHints = <1>{
+          enumMemberValues = {
+            enabled = true
+          },
+          functionLikeReturnTypes = {
+            enabled = true
+          },
+          parameterNames = {
+            enabled = "literals"
+          },
+          parameterTypes = {
+            enabled = true
+          },
+          propertyDeclarationTypes = {
+            enabled = true
+          },
+          variableTypes = {
+            enabled = false
+          }
+        },
+        suggest = <2>{
+          completeFunctionCalls = true
+        },
+        updateImportsOnFileMove = <3>{
+          enabled = "always"
+        }
+      },
+      typescript = {
+        inlayHints = <table 1>,
+        suggest = <table 2>,
+        updateImportsOnFileMove = <table 3>
+      },
+      vtsls = {
+        autoUseWorkspaceTsdk = true,
+        enableMoveToFileCodeAction = true,
+        experimental = {
+          completion = {
+            enableServerSideFuzzyMatch = true
+          },
+          maxInlayHintLength = 30
+        },
+        tsserver = {
+          globalPlugins = { {
+              configNamespace = "typescript",
+              enableForWorkspaceTypeScriptVersions = true,
+              languages = { "vue" },
+              location = "/Users/sasmitai/.local/share/nvim/mason/packages/vue-language-server/node_modules/@vue/language-server",
+              name = "@vue/typescript-plugin"
+            } }
+        }
+      }
+    }
+
+- vue_ls:
+  - capabilities: {
+      textDocument = {
+        completion = {
+          completionItem = {
+            commitCharactersSupport = false,
+            deprecatedSupport = true,
+            documentationFormat = { "markdown", "plaintext" },
+            insertReplaceSupport = true,
+            insertTextModeSupport = {
+              valueSet = { 1 }
+            },
+            labelDetailsSupport = true,
+            preselectSupport = false,
+            resolveSupport = {
+              properties = { "documentation", "detail", "additionalTextEdits", "command", "data" }
+            },
+            snippetSupport = true,
+            tagSupport = {
+              valueSet = { 1 }
+            }
+          },
+          completionList = {
+            itemDefaults = { "commitCharacters", "editRange", "insertTextFormat", "insertTextMode", "data" }
+          },
+          contextSupport = true,
+          insertTextMode = 1
+        }
+      },
+      workspace = {
+        fileOperations = {
+          didRename = true,
+          willRename = true
+        }
+      }
+    }
+  - cmd: { "vue-language-server", "--stdio" }
+  - filetypes: vue
+  - keys: { { "<leader>cl", <function 1>,
+        desc = "Lsp Info",
+        mode = "n"
+      }, { "gd", <function 2>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 3>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 4>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 5>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "gD", <function 6>,
+        desc = "Goto Declaration",
+        mode = "n"
+      }, { "K", <function 7>,
+        desc = "Hover",
+        mode = "n"
+      }, { "gK", <function 8>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "n"
+      }, { "<c-k>", <function 9>,
+        desc = "Signature Help",
+        has = "signatureHelp",
+        mode = "i"
+      }, { "<leader>ca", <function 10>,
+        desc = "Code Action",
+        has = "codeAction",
+        mode = { "n", "x" }
+      }, { "<leader>cc", <function 11>,
+        desc = "Run Codelens",
+        has = "codeLens",
+        mode = { "n", "x" }
+      }, { "<leader>cC", <function 12>,
+        desc = "Refresh & Display Codelens",
+        has = "codeLens",
+        mode = { "n" }
+      }, { "<leader>cR", <function 13>,
+        desc = "Rename File",
+        has = { "workspace/didRenameFiles", "workspace/willRenameFiles" },
+        mode = { "n" }
+      }, { "<leader>cr", <function 14>,
+        desc = "Rename",
+        has = "rename",
+        mode = "n"
+      }, { "<leader>cA", <function 15>,
+        desc = "Source Action",
+        has = "codeAction",
+        mode = "n"
+      }, { "]]", <function 16>,
+        desc = "Next Reference",
+        enabled = <function 17>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "[[", <function 18>,
+        desc = "Prev Reference",
+        enabled = <function 19>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-n>", <function 20>,
+        desc = "Next Reference",
+        enabled = <function 21>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "<a-p>", <function 22>,
+        desc = "Prev Reference",
+        enabled = <function 23>,
+        has = "documentHighlight",
+        mode = "n"
+      }, { "gd", <function 24>,
+        desc = "Goto Definition",
+        has = "definition",
+        mode = "n"
+      }, { "gr", <function 25>,
+        desc = "References",
+        mode = "n",
+        nowait = true
+      }, { "gI", <function 26>,
+        desc = "Goto Implementation",
+        mode = "n"
+      }, { "gy", <function 27>,
+        desc = "Goto T[y]pe Definition",
+        mode = "n"
+      }, { "<leader>ss", <function 28>,
+        desc = "LSP Symbols",
+        has = "documentSymbol",
+        mode = "n"
+      }, { "<leader>sS", <function 29>,
+        desc = "LSP Workspace Symbols",
+        has = "workspace/symbols",
+        mode = "n"
+      }, { "gai", <function 30>,
+        desc = "C[a]lls Incoming",
+        has = "callHierarchy/incomingCalls",
+        mode = "n"
+      }, { "gao", <function 31>,
+        desc = "C[a]lls Outgoing",
+        has = "callHierarchy/outgoingCalls",
+        mode = "n"
+      } }
+  - on_init: <function @/Users/sasmitai/.local/share/nvim/lazy/nvim-lspconfig/lsp/vue_ls.lua:26>
+  - root_markers: { "package.json" }
+
+
+vim.lsp: File Watcher ~
+- file watching "(workspace/didChangeWatchedFiles)" disabled on all clients
+
+vim.lsp: Position Encodings ~
+- No buffers contain mixed position encodings
+
+

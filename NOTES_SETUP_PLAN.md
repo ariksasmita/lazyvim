@@ -38,17 +38,17 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 
 **Action Steps:**
 
-1.  **Fix on open and file select via telscope theme change**: Theme does not change on opening a file or selecting a file via telescope. Fix this issue to ensure consistent theming across all actions.
+1.  **Fix on open and file select via telscope theme change (Completed)**: Theme does not change on opening a file or selecting a file via telescope. Fix this issue to ensure consistent theming across all actions.
 2.  **Keybinding for basic formatting (Completed)**: Add keybindings for bold, italics, underline, strikethrough, code, and code block formatting in markdown files.
 3.  **Keybinding for inserting links (Completed)**: Add keybindings to insert markdown links easily.
 4.  **Keybinding for inserting checkboxes (Completed)**: Added keybindings to insert markdown checkboxes easily.
 5.  **Quick Heading Search (Completed)**: Implemented a keymap to quickly search and navigate to headings within a markdown file.
 6.  **Small icon compared to normal text (Pending User Action)**: Icon shown such as checkboxes and headings are smaller than normal text. Fix this issue to ensure icons are visually consistent with surrounding text. Is it terminal or neovim issue? (Requires user to install a different Nerd Font).
-7.  **Image Preview in terminal**: Implement image preview functionality within the terminal for markdown files, allowing users to view images directly in Neovim. See the blogpost for reference.
+7.  **Image Preview in terminal (Completed)**: Implement image preview functionality within the terminal for markdown files, allowing users to view images directly in Neovim. See the blogpost for reference.
 8.  **Auto-formatting on Save (Completed)**: Configure `prettier` to automatically format Markdown files when they are saved.
-9.  **Update Neovim:** Update the Neovim instance to the latest stable version (e.g., 0.12 or newer) to get the latest features and security fixes. This may require checking for and fixing breaking changes.
-[Google Search](https://www.google.com/search?q=how+to+update+neovim+to+latest+version)
-[Antropic Claude](https://chat.anthropic.com/chat?model=claude-2)
+9.  **Update Neovim (Completed)**: Update the Neovim instance to the latest stable version (e.g., 0.12 or newer) to get the latest features and security fixes. This may require checking for and fixing breaking changes.
+    [Google Search](https://www.google.com/search?q=how+to+update+neovim+to+latest+version)
+    [Antropic Claude](https://chat.anthropic.com/chat?model=claude-2)
 
 ---
 
@@ -63,24 +63,52 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 
 ---
 
-## 7. Next Steps
+## 7. Phase 6: YAML Frontmatter Metadata (Completed)
 
-This plan provides our roadmap. We will now focus on the remaining tasks in **Phase 4**.
+**Objective:** Leverage the Obsidian-style YAML headers in Markdown files for enhanced note management.
+
+**Action Steps:**
+
+1. **YAML Parsing & Display**: Added functions to parse frontmatter and a keymap (`<leader>ym`) to display metadata (title, tags, status, etc.).
+2. **Auto-Update Dates**: Automatically update the 'updated' field to today's date on file save.
+3. **Metadata Search Functionality**: Implemented search and filtering of notes by YAML frontmatter fields (e.g., status, tags, priority, or custom fields) using Telescope for efficient navigation and organization (via `<leader>ys` keymap).
 
 ---
 
-## 8. Keybindings Summary
+## 7. Phase 7: Backlinks System (Completed)
+
+**Objective:** Implement a backlinks system to link notes together, similar to Obsidian.
+
+**Action Steps:**
+
+1. **Telescope Integration**: Created a custom Telescope picker (`<leader>bl`) to search and select Markdown files for linking.
+2. **Insert Links**: On selection, inserts a Markdown link `[title](path.md)` at cursor.
+
+---
+
+## 8. Next Steps
+
+This plan provides our roadmap. Most features are implemented. Focus on testing and any remaining user preferences.
+
+---
+
+## 10. Keybindings Summary
 
 Here is a summary of the keybindings implemented so far:
 
-*   **`<leader>xt`**: Open Centralized TODOs View (via `trouble.nvim`)
-*   **`<leader>cx`**: Toggle Markdown Checkbox on current line
-*   **`<leader>cm`**: Move completed Markdown Checkbox item to `## DONE` section
-*   **`<leader>ci`**: Insert Markdown Checkbox on a new line below, with indentation, and enter insert mode
-*   **`<leader>sh`**: Search Headings in current Markdown file (via Telescope LSP Document Symbols)
-*   **`link` + `<Tab>`**: Insert Markdown Link `[text](url)` snippet (via `LuaSnip`)
-*   **`<leader>mb`**: Markdown Bold (`**text**`) - Normal/Visual mode
-*   **`<leader>mi`**: Markdown Italic (`*text*`) - Normal/Visual mode
-*   **`<leader>ms`**: Markdown Strikethrough (`~~text~~`) - Normal/Visual mode
-*   **`<leader>mc`**: Markdown Inline Code (`` `text` ``) - Normal/Visual mode
-*   **`<leader>mC`**: Markdown Code Block (` ``` `) - Normal/Visual mode
+- **`<leader>xt`**: Open Centralized TODOs View (via `trouble.nvim`)
+- **`<leader>cx`**: Toggle Markdown Checkbox on current line
+- **`<leader>cm`**: Move completed Markdown Checkbox item to `## DONE` section
+- **`<leader>ci`**: Insert Markdown Checkbox on a new line below, with indentation, and enter insert mode
+- **`<leader>sh`**: Search Headings in current Markdown file (via Telescope LSP Document Symbols)
+- **`<leader>ym`**: Display YAML frontmatter metadata
+- **`<leader>yh`**: Insert YAML frontmatter manually
+- **`<leader>bl`**: Insert backlink to another Markdown file (via Telescope)
+- **`<leader>ys`**: YAML Search (search/filter notes by YAML fields using Telescope)
+- **`link` + `<Tab>`**: Insert Markdown Link `[text](url)` snippet (via `LuaSnip`)
+- **`<leader>mb`**: Markdown Bold (`**text**`) - Normal/Visual mode
+- **`<leader>mi`**: Markdown Italic (`*text*`) - Normal/Visual mode
+- **`<leader>ms`**: Markdown Strikethrough (`~~text~~`) - Normal/Visual mode
+- **`<leader>mc`**: Markdown Inline Code (`` `text` ``) - Normal/Visual mode
+- **`<leader>mC`**: Markdown Code Block (` ``` `) - Normal/Visual mode
+

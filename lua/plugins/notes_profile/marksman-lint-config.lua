@@ -17,7 +17,7 @@ return {
       settings = {
         markdown = {
           diagnostics = {
-            disable = { "MD012", "MD013" },
+            disable = { "MD012", "MD013", "MD034", "MD039" },
           },
         },
       },

@@ -5,6 +5,185 @@ return {
   -- We declare a dependency on LuaSnip to ensure it's loaded before this config runs.
   "L3MON4D3/LuaSnip",
   config = function()
+    if package.loaded["blink.cmp"] then
+      require("blink.cmp.sources").luasnip.add_loader(function()
+        require("luasnip.loaders.from_lua").load({
+          paths = {
+            vim.fn.stdpath("config") .. "/lua/plugins/notes_profile/snippets",
+          },
+        })
+      end)
+    end
+
+    -- Function to parse YAML frontmatter from current buffer
+    local function parse_yaml_frontmatter()
+      local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+      local frontmatter = {}
+      local in_frontmatter = false
+      for i, line in ipairs(lines) do
+        if line == "---" then
+          if not in_frontmatter then
+            in_frontmatter = true
+          else
+            break
+          end
+        elseif in_frontmatter then
+          local key, value = line:match("^(%w+):%s*(.+)$")
+          if key and value then
+            frontmatter[key] = value
+          end
+        end
+      end
+      return frontmatter
+    end
+
+    -- Function to parse YAML frontmatter from a file (enhanced to handle lists)
+    local function parse_yaml_from_file(filepath)
+      local file = io.open(filepath, "r")
+      if not file then return {} end
+      local lines = {}
+      for line in file:lines() do
+        table.insert(lines, line)
+      end
+      file:close()
+
+      local frontmatter = {}
+      local in_frontmatter = false
+      local current_key = nil
+      local current_list = nil
+      for _, line in ipairs(lines) do
+        if line == "---" then
+          if not in_frontmatter then
+            in_frontmatter = true
+          else
+            break
+          end
+        elseif in_frontmatter then
+          local key, value = line:match("^(%w+):%s*(.*)$")
+          if key then
+            value = value:match("^%s*(.-)%s*$") or value -- trim whitespace
+            if current_list then
+              frontmatter[current_key] = current_list
+              current_list = nil
+            end
+            current_key = key
+            if value == "" then
+              current_list = {}
+            elseif value:match("^%[") then
+              -- inline list, split by comma
+              local list = {}
+              for item in value:gmatch("[^,%[%]]+") do
+                table.insert(list, item:match("^%s*(.-)%s*$"))
+              end
+              frontmatter[key] = list
+              current_key = nil
+            else
+              frontmatter[key] = value
+              current_key = nil
+            end
+          elseif current_key and line:match("^%s*- (.+)") then
+            if not current_list then current_list = {} end
+            table.insert(current_list, line:match("^%s*- (.+)"))
+          elseif line == "" and current_list then
+            frontmatter[current_key] = current_list
+            current_list = nil
+            current_key = nil
+          end
+        end
+      end
+      if current_list then
+        frontmatter[current_key] = current_list
+      end
+      return frontmatter
+    end
+
+    local notes_cache = nil
+    local cache_time = 0
+
+    -- Function to collect all note metadata with caching
+    local function collect_notes_metadata()
+      local notes_dir = vim.fn.expand("~/Library/CloudStorage/OneDrive-DANAINDONESIA/notevault")
+      local current_time = vim.fn.localtime()
+      if notes_cache and (current_time - cache_time) < 60 then -- cache for 60 seconds
+        return notes_cache
+      end
+      local cmd = "find " .. vim.fn.shellescape(notes_dir) .. " -name '*.md' -type f"
+      local md_files = vim.fn.systemlist(cmd)
+      local notes = {}
+      for _, filepath in ipairs(md_files) do
+        local meta = parse_yaml_from_file(filepath)
+        if not vim.tbl_isempty(meta) then
+          local relative_path = vim.fn.fnamemodify(filepath, ":~:.")
+          table.insert(notes, {
+            filepath = filepath,
+            relative_path = relative_path,
+            title = meta.title or vim.fn.fnamemodify(filepath, ":t:r"),
+            metadata = meta,
+          })
+        end
+      end
+      notes_cache = notes
+      cache_time = current_time
+      return notes
+    end
+
+    -- Custom Telescope picker for metadata search
+    local function metadata_search_picker()
+      local notes = collect_notes_metadata()
+      local picker_entries = {}
+      for _, note in ipairs(notes) do
+        local status = note.metadata.status or "N/A"
+        local tags_str = type(note.metadata.tags) == "table" and table.concat(note.metadata.tags, ",") or note.metadata.tags or "N/A"
+        local display = note.title .. " [status:" .. status .. "] [tags:" .. tags_str .. "]"
+        local ordinal = note.title .. " status:" .. status .. " tags:" .. tags_str
+        table.insert(picker_entries, {
+          value = note.relative_path,
+          display = display,
+          ordinal = ordinal,
+          note = note,
+        })
+      end
+
+      require("telescope.pickers").new({}, {
+        prompt_title = "Search Notes by Metadata",
+        finder = require("telescope.finders").new_table({
+          results = picker_entries,
+          entry_maker = function(entry)
+            return {
+              value = entry.value,
+              display = entry.display,
+              ordinal = entry.ordinal,
+              note = entry.note,
+            }
+          end,
+        }),
+        sorter = require("telescope.sorters").get_generic_fuzzy_sorter(),
+        attach_mappings = function(prompt_bufnr, map)
+          local actions = require("telescope.actions")
+          local action_state = require("telescope.actions.state")
+          actions.select_default:replace(function()
+            actions.close(prompt_bufnr)
+            local selection = action_state.get_selected_entry()
+            if selection then
+              vim.cmd("edit " .. selection.note.filepath)
+            end
+          end)
+          map("i", "<C-j>", actions.move_selection_next)
+          map("i", "<C-k>", actions.move_selection_previous)
+          return true
+        end,
+        previewer = require("telescope.previewers").new_buffer_previewer({
+          define_preview = function(self, entry)
+            local filepath = entry.note.filepath
+            local bufnr = self.state.bufnr
+            local lines = vim.fn.readfile(filepath)
+            vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+            vim.api.nvim_buf_set_option(bufnr, "filetype", "markdown")
+          end,
+        }),
+      }):find()
+    end
+
     local function toggle_checkbox()
       local line = vim.api.nvim_get_current_line()
       local lnum = vim.api.nvim_win_get_cursor(0)[1]
@@ -47,6 +226,33 @@ return {
       vim.api.nvim_buf_set_lines(0, done_section_lnum, done_section_lnum, false, { line_content })
       vim.notify("Moved checked item to '## DONE' section.", vim.log.levels.INFO)
     end
+
+    -- Auto-update 'updated' field in YAML on save
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      pattern = "*.md",
+      group = vim.api.nvim_create_augroup("MarkdownAutoUpdate", { clear = true }),
+      callback = function()
+        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+        local in_frontmatter = false
+        local updated_line = nil
+        for i, line in ipairs(lines) do
+          if line == "---" then
+            if not in_frontmatter then
+              in_frontmatter = true
+            else
+              break
+            end
+          elseif in_frontmatter and line:match("^updated:") then
+            updated_line = i - 1
+            break
+          end
+        end
+        if updated_line then
+          local now = os.date("%Y-%m-%d %H:%M:%S")
+          vim.api.nvim_buf_set_lines(0, updated_line, updated_line + 1, false, { "updated: " .. now })
+        end
+      end,
+    })
 
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "markdown",
@@ -98,5 +304,81 @@ return {
         vim.keymap.set({ "n", "v" }, "<leader>ms", function() surround("~~", "~~") end, { buffer = true, desc = "Markdown Strikethrough" })
         vim.keymap.set({ "n", "v" }, "<leader>mc", function() surround("`", "`") end, { buffer = true, desc = "Markdown Inline Code" })
 
-          end,
-        }
+        -- Keymap for Code Block
+        vim.keymap.set({ "n", "v" }, "<leader>mC", function()
+          local mode = vim.fn.mode()
+          if mode:find("[vV\x16]") then -- Visual modes
+            vim.cmd("normal! c```<CR><C-r>\"<CR>```")
+          else -- Normal mode
+            vim.cmd("normal! o```<CR><CR>```<Esc>O")
+          end
+        end, { buffer = true, desc = "Markdown Code Block" })
+
+        -- Keymap to display YAML metadata
+        vim.keymap.set("n", "<leader>ym", function()
+          local meta = parse_yaml_frontmatter()
+          if vim.tbl_isempty(meta) then
+            vim.notify("No YAML frontmatter found.", vim.log.levels.INFO)
+            return
+          end
+          local msg = "Metadata:\n"
+          for k, v in pairs(meta) do
+            msg = msg .. k .. ": " .. v .. "\n"
+          end
+          vim.notify(msg, vim.log.levels.INFO)
+        end, { buffer = true, desc = "Show YAML Metadata" })
+
+        -- Keymap to insert YAML frontmatter manually
+        vim.keymap.set("n", "<leader>yh", function()
+          local title = vim.fn.expand("%:t:r")
+          local now = os.date("%Y-%m-%d %H:%M:%S")
+          local frontmatter = {
+            "---",
+            "title: " .. title,
+            "tags:",
+            "  - ",
+            "created: " .. now,
+            "updated: " .. now,
+            "status: draft",
+            "type: note",
+            "---",
+            "",
+          }
+          vim.api.nvim_buf_set_lines(0, 0, 0, false, frontmatter)
+          vim.api.nvim_win_set_cursor(0, {2, #frontmatter[2]})
+        end, { buffer = true, desc = "Insert YAML Frontmatter" })
+
+        -- Keymap to insert backlink via Telescope
+        vim.keymap.set("n", "<leader>bl", function()
+          require("telescope.builtin").find_files({
+            prompt_title = "Select Note for Backlink",
+            cwd = vim.fn.expand("~/Library/CloudStorage/OneDrive-DANAINDONESIA/notevault"),
+            find_command = { "find", ".", "-name", "*.md", "-type", "f" },
+            attach_mappings = function(prompt_bufnr, map)
+              local actions = require("telescope.actions")
+              local action_state = require("telescope.actions.state")
+              actions.select_default:replace(function()
+                actions.close(prompt_bufnr)
+                local selection = action_state.get_selected_entry()
+                if selection then
+                  local telescope_cwd = vim.fn.expand("~/Library/CloudStorage/OneDrive-DANAINDONESIA/notevault")
+                  local selected_abs = telescope_cwd .. "/" .. selection.value
+                  local filepath = vim.fn.fnamemodify(selected_abs, ":~:.")
+                  local title = vim.fn.fnamemodify(selected_abs, ":t:r")
+                  local link = "[" .. title .. "](" .. filepath .. ")"
+                  vim.api.nvim_put({ link }, "c", true, true)
+                end
+              end)
+              map("i", "<C-j>", actions.move_selection_next)
+              map("i", "<C-k>", actions.move_selection_previous)
+              return true
+            end,
+          })
+        end, { buffer = true, desc = "Insert Backlink" })
+
+        -- Keymap for metadata search
+        vim.keymap.set("n", "<leader>ys", metadata_search_picker, { buffer = true, desc = "YAML Search" })
+      end,
+    })
+  end,
+}

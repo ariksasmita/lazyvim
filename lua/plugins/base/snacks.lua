@@ -3,6 +3,9 @@ return {
   {
     "folke/snacks.nvim",
     opts = {
+      image = {
+        enabled = true,
+      },
       -- Configuration for the explorer
       picker = {
         sources = {

@@ -66,7 +66,7 @@ function M.paste_image()
 end
 
 -- Set up the keymap
-vim.keymap.set({ "n", "i" }, "<leader>p", M.paste_image, { desc = "Paste Image from Clipboard (Local)" })
+vim.keymap.set({ "n" }, "<leader>p", M.paste_image, { desc = "Paste Image from Clipboard (Local)" })
 
 -- Return an empty table to be consistent with plugin structure, even though it's not a real plugin.
 return {}
