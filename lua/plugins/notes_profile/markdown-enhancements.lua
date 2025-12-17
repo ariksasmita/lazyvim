@@ -122,8 +122,15 @@ return {
           })
         end
       end
-      notes_cache = notes
-      cache_time = current_time
+      -- Sort by updated date descending, then by title
+      table.sort(notes, function(a, b)
+        local a_date = a.metadata.updated or ""
+        local b_date = b.metadata.updated or ""
+        if a_date ~= b_date then
+          return a_date > b_date
+        end
+        return (a.title or "") < (b.title or "")
+      end)
       return notes
     end
 
@@ -176,8 +183,11 @@ return {
           define_preview = function(self, entry)
             local filepath = entry.note.filepath
             local bufnr = self.state.bufnr
-            local lines = vim.fn.readfile(filepath)
+            local lines = vim.fn.readfile(filepath, "", 20) -- Preview first 20 lines
             vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
+            if #lines == 20 then
+              vim.api.nvim_buf_set_lines(bufnr, 20, 20, false, {"... (truncated)"})
+            end
             vim.api.nvim_buf_set_option(bufnr, "filetype", "markdown")
           end,
         }),
@@ -335,6 +345,8 @@ return {
           local frontmatter = {
             "---",
             "title: " .. title,
+            "aliases:",
+            "  - ",
             "tags:",
             "  - ",
             "created: " .. now,
@@ -347,6 +359,44 @@ return {
           vim.api.nvim_buf_set_lines(0, 0, 0, false, frontmatter)
           vim.api.nvim_win_set_cursor(0, {2, #frontmatter[2]})
         end, { buffer = true, desc = "Insert YAML Frontmatter" })
+
+        -- Keymap to insert meeting note template
+        vim.keymap.set("n", "<leader>yhm", function()
+          local title = vim.fn.expand("%:t:r")
+          local now = os.date("%Y-%m-%d %H:%M:%S")
+          local frontmatter = {
+            "---",
+            "title: " .. title,
+            "aliases:",
+            "  - ",
+            "tags:",
+            "  - meeting",
+            "created: " .. now,
+            "updated: " .. now,
+            "status: draft",
+            "type: meeting",
+            "attendees:",
+            "  - ",
+            "date: " .. os.date("%Y-%m-%d"),
+            "---",
+            "",
+            "# Meeting Notes: " .. title,
+            "",
+            "## Attendees",
+            "- ",
+            "",
+            "## Agenda",
+            "- ",
+            "",
+            "## Discussion",
+            "",
+            "## Action Items",
+            "- [ ] ",
+            "",
+          }
+          vim.api.nvim_buf_set_lines(0, 0, 0, false, frontmatter)
+          vim.api.nvim_win_set_cursor(0, {2, #frontmatter[2]})
+        end, { buffer = true, desc = "Insert Meeting Note Template" })
 
         -- Keymap to insert backlink via Telescope
         vim.keymap.set("n", "<leader>bl", function()
@@ -378,6 +428,116 @@ return {
 
         -- Keymap for metadata search
         vim.keymap.set("n", "<leader>ys", metadata_search_picker, { buffer = true, desc = "YAML Search" })
+
+        -- Keymap for full-text search in notes vault
+        vim.keymap.set("n", "<leader>fn", function()
+          require("telescope.builtin").live_grep({
+            prompt_title = "Search in Notes",
+            cwd = vim.fn.expand("~/Library/CloudStorage/OneDrive-DANAINDONESIA/notevault"),
+          })
+        end, { buffer = true, desc = "Full-Text Search in Notes" })
+
+        -- Keymap to generate Table of Contents
+        vim.keymap.set("n", "<leader>toc", function()
+          local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+          local toc = { "## Table of Contents", "" }
+          for i, line in ipairs(lines) do
+            local level, title = line:match("^(#+)%s+(.+)$")
+            if level and title then
+              local indent = string.rep("  ", #level - 1)
+              local link = "[" .. title .. "](#" .. title:lower():gsub("%s+", "-"):gsub("[^%w%-]", "") .. ")"
+              table.insert(toc, indent .. "- " .. link)
+            end
+          end
+          table.insert(toc, "")
+          -- Insert at top, after frontmatter if any
+          local insert_line = 0
+          for i, line in ipairs(lines) do
+            if line == "---" then
+              if i > 1 then
+                insert_line = i + 1
+                break
+              end
+            elseif line:match("^#") then
+              insert_line = i - 1
+              break
+            end
+          end
+          vim.api.nvim_buf_set_lines(0, insert_line, insert_line, false, toc)
+          vim.notify("TOC generated", vim.log.levels.INFO)
+        end, { buffer = true, desc = "Generate Table of Contents" })
+
+        -- Keymap to show word/character count
+        vim.keymap.set("n", "<leader>wc", function()
+          local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+          local words = 0
+          local chars = 0
+          for _, line in ipairs(lines) do
+            chars = chars + #line
+            for word in line:gmatch("%S+") do
+              words = words + 1
+            end
+          end
+          vim.notify(string.format("Words: %d, Characters: %d", words, chars), vim.log.levels.INFO)
+        end, { buffer = true, desc = "Word/Character Count" })
+
+        -- Smart folding for Markdown
+        vim.opt_local.foldmethod = "expr"
+        vim.opt_local.foldexpr = "MarkdownFold()"
+        vim.opt_local.foldlevel = 1
+
+        function MarkdownFold()
+          local line = vim.fn.getline(vim.v.lnum)
+          local level = line:match("^(#+)")
+          if level then
+            return #level
+          end
+          return "="
+        end
+
+        -- Auto-continue Markdown lists
+        local function get_list_prefix(line)
+          local marker = line:match("^%s*([-*+]%s+)")
+          if marker then
+            return marker
+          end
+          local num = line:match("^%s*(%d+)%.%s+")
+          if num then
+            local next_num = tostring(tonumber(num) + 1)
+            return next_num .. ". "
+          end
+          return nil
+        end
+
+        vim.keymap.set("i", "<CR>", function()
+          local line = vim.api.nvim_get_current_line()
+          local prefix = get_list_prefix(line)
+          if prefix then
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>" .. prefix, true, true, true), "n", false)
+          else
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, true, true), "n", false)
+          end
+        end, { buffer = true })
+
+        vim.keymap.set("n", "o", function()
+          local line = vim.api.nvim_get_current_line()
+          local prefix = get_list_prefix(line)
+          if prefix then
+            vim.api.nvim_feedkeys("o" .. prefix, "n", false)
+          else
+            vim.api.nvim_feedkeys("o", "n", false)
+          end
+        end, { buffer = true })
+
+        vim.keymap.set("n", "O", function()
+          local line = vim.api.nvim_get_current_line()
+          local prefix = get_list_prefix(line)
+          if prefix then
+            vim.api.nvim_feedkeys("O" .. prefix, "n", false)
+          else
+            vim.api.nvim_feedkeys("O", "n", false)
+          end
+        end, { buffer = true })
       end,
     })
   end,

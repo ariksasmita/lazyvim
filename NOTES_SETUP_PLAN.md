@@ -72,6 +72,7 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 1. **YAML Parsing & Display**: Added functions to parse frontmatter and a keymap (`<leader>ym`) to display metadata (title, tags, status, etc.).
 2. **Auto-Update Dates**: Automatically update the 'updated' field to today's date on file save.
 3. **Metadata Search Functionality**: Implemented search and filtering of notes by YAML frontmatter fields (e.g., status, tags, priority, or custom fields) using Telescope for efficient navigation and organization (via `<leader>ys` keymap).
+4. **List Auto-Continuation**: Implemented automatic continuation of unordered (`-`, `*`, `+`) and ordered (`1.`, `2.`, etc.) lists when pressing Enter in insert mode or using o/O in normal mode.
 
 ---
 
@@ -86,7 +87,23 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 
 ---
 
-## 8. Next Steps
+## 8. Phase 8: Additional Quality-of-Life Improvements (Planned)
+
+**Objective:** Add final enhancements for writing, organization, and searching to polish the notes setup.
+
+**Action Steps:**
+
+1. **Full-Text Search Across Vault**: Implemented a Telescope live_grep picker limited to the notes directory for searching note content (e.g., `<leader>fn` keymap).
+2. **Automatic Table of Contents (TOC)**: Implemented functionality to generate a TOC from headings in the current note (e.g., `<leader>toc` inserts a TOC section).
+3. **Note Templates Expansion**: Expanded to include meeting note template (via `<leader>yhm` keymap).
+4. **Smart Folding for Markdown**: Implemented folding by heading levels for better navigation in long notes.
+5. **Improved Metadata Search**: Implemented sorting by updated date (newest first) and enhanced previews (show first 20 lines with truncation) in the metadata picker.
+6. **Auto-Formatting on Paste**: Automatically rewrap and format pasted text in Markdown files to maintain clean formatting.
+7. **Word/Character Count Display**: Implemented word/character count display (via `<leader>wc` keymap).
+
+---
+
+## 9. Next Steps
 
 This plan provides our roadmap. Most features are implemented. Focus on testing and any remaining user preferences.
 
@@ -105,7 +122,12 @@ Here is a summary of the keybindings implemented so far:
 - **`<leader>yh`**: Insert YAML frontmatter manually
 - **`<leader>bl`**: Insert backlink to another Markdown file (via Telescope)
 - **`<leader>ys`**: YAML Search (search/filter notes by YAML fields using Telescope)
+- **`<leader>fn`**: Full-text search across notes vault (via Telescope live_grep)
+- **`<leader>toc`**: Generate Table of Contents from headings
+- **`<leader>wc`**: Show word/character count
+- **`<leader>yhm`**: Insert meeting note template
 - **`link` + `<Tab>`**: Insert Markdown Link `[text](url)` snippet (via `LuaSnip`)
+- **`table` + `<Tab>`**: Insert Markdown Table snippet (via `LuaSnip`)
 - **`<leader>mb`**: Markdown Bold (`**text**`) - Normal/Visual mode
 - **`<leader>mi`**: Markdown Italic (`*text*`) - Normal/Visual mode
 - **`<leader>ms`**: Markdown Strikethrough (`~~text~~`) - Normal/Visual mode
