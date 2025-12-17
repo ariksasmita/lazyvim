@@ -477,6 +477,57 @@ return {
           })
         end, { buffer = true, desc = "Full-Text Search in Notes" })
 
+        -- Keymap to start Pomodoro timer on checkbox
+        vim.keymap.set("n", "<leader>pt", function()
+          local line = vim.api.nvim_get_current_line()
+          if line:match("^%s*- %[.%] ") then
+            local text = line:match("^%s*- %[.%] (.*)")
+            if text then
+              local short = text:gsub("%W", "_"):sub(1,10)
+              vim.cmd("TimerStart 25m " .. short)
+              vim.notify("Started 25m Pomodoro: " .. short, vim.log.levels.INFO)
+            end
+          else
+            vim.notify("Not on a checkbox line", vim.log.levels.WARN)
+          end
+        end, { buffer = true, desc = "Start Pomodoro on Checkbox" })
+
+        -- Keymap to mark Pomodoro session on checkbox
+        vim.keymap.set("n", "<leader>pm", function()
+          local line = vim.api.nvim_get_current_line()
+          local lnum = vim.api.nvim_win_get_cursor(0)[1]
+          if line:match("^%s*- %[.%] ") then
+            local current_count = 0
+            local count_match = line:match(" | %[([*]*)%]")
+            if count_match then
+              current_count = #count_match
+            end
+            local new_count = current_count + 1
+            local new_marker = " | [" .. string.rep("*", new_count) .. "]"
+            if count_match then
+              line = line:gsub(" | %[([*]*)%]", new_marker)
+            else
+              line = line .. new_marker
+            end
+            vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, {line})
+            vim.notify("Marked session: " .. new_count .. " total", vim.log.levels.INFO)
+          else
+            vim.notify("Not on a checkbox line", vim.log.levels.WARN)
+          end
+        end, { buffer = true, desc = "Mark Pomodoro Session on Checkbox" })
+
+        -- Keymap for short rest (5m)
+        vim.keymap.set("n", "<leader>prs", function()
+          vim.cmd("TimerStart 5m Rest")
+          vim.notify("Started 5m Rest", vim.log.levels.INFO)
+        end, { buffer = true, desc = "Start Short Rest Timer" })
+
+        -- Keymap for long rest (10m)
+        vim.keymap.set("n", "<leader>prl", function()
+          vim.cmd("TimerStart 10m Rest")
+          vim.notify("Started 10m Rest", vim.log.levels.INFO)
+        end, { buffer = true, desc = "Start Long Rest Timer" })
+
         -- Keymap to generate Table of Contents
         vim.keymap.set("n", "<leader>toc", function()
           local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)

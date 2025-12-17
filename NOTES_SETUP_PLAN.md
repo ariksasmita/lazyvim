@@ -100,6 +100,7 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 5. **Improved Metadata Search**: Implemented sorting by updated date (newest first) and enhanced previews (show first 20 lines with truncation) in the metadata picker.
 6. **Auto-Formatting on Paste**: Automatically rewrap and format pasted text in Markdown files to maintain clean formatting.
 7. **Word/Character Count Display**: Implemented word/character count display (via `<leader>wc` keymap).
+8. **Pomodoro Integration with Checkboxes**: Integrate pomo.nvim to start 25m timers on checkbox lines (using sanitized text as title), manually append session markers (` | [*]`, ` | [**]`, etc.) via `<leader>pm` keymap, and provide short (5m) and long (10m) rest timers via `<leader>prs` and `<leader>prl`.
 
 ---
 
@@ -126,6 +127,10 @@ Here is a summary of the keybindings implemented so far:
 - **`<leader>toc`**: Generate Table of Contents from headings
 - **`<leader>wc`**: Show word/character count
 - **`<leader>yhm`**: Insert meeting note template
+- **`<leader>pt`**: Start Pomodoro timer on checkbox line
+- **`<leader>pm`**: Mark Pomodoro session on checkbox line
+- **`<leader>prs`**: Start short rest timer (5m)
+- **`<leader>prl`**: Start long rest timer (10m)
 - **`link` + `<Tab>`**: Insert Markdown Link `[text](url)` snippet (via `LuaSnip`)
 - **`table` + `<Tab>`**: Insert Markdown Table snippet (via `LuaSnip`)
 - **`<leader>mb`**: Markdown Bold (`**text**`) - Normal/Visual mode
