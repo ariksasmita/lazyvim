@@ -96,7 +96,7 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 1. **Full-Text Search Across Vault**: Implemented a Telescope live_grep picker limited to the notes directory for searching note content (e.g., `<leader>fn` keymap).
 2. **Automatic Table of Contents (TOC)**: Implemented functionality to generate a TOC from headings in the current note (e.g., `<leader>toc` inserts a TOC section).
 3. **Note Templates Expansion**: Expanded to include meeting note template (via `<leader>yhm` keymap).
-4. **Smart Folding for Markdown**: Implemented folding by heading levels for better navigation in long notes.
+4. **Smart Folding for Markdown**: Planned - Enable folding by heading levels for better navigation in long notes.
 5. **Improved Metadata Search**: Implemented sorting by updated date (newest first) and enhanced previews (show first 20 lines with truncation) in the metadata picker.
 6. **Auto-Formatting on Paste**: Automatically rewrap and format pasted text in Markdown files to maintain clean formatting.
 7. **Word/Character Count Display**: Implemented word/character count display (via `<leader>wc` keymap).

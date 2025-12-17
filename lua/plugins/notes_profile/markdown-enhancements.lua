@@ -284,13 +284,53 @@ return {
 
         vim.keymap.set("n", "<leader>ci", insert_checkbox_below, { buffer = true, desc = "Insert Checkbox Below" })
         vim.keymap.set("n", "<leader>sh", function()
-          require("telescope.builtin").lsp_document_symbols({
+          local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+          local headings = {}
+          for i, line in ipairs(lines) do
+            local level, title = line:match("^(#+)%s+(.+)$")
+            if level and title then
+              table.insert(headings, {
+                lnum = i,
+                level = #level,
+                title = title,
+                display = string.rep("#", #level) .. " " .. title,
+              })
+            end
+          end
+          require("telescope.pickers").new({
+            layout_config = {
+              width = 0.6,
+              height = 0.4,
+            },
+          }, {
+            prompt_title = "Search Headings",
+            finder = require("telescope.finders").new_table({
+              results = headings,
+              entry_maker = function(entry)
+                return {
+                  value = entry.lnum,
+                  display = entry.display,
+                  ordinal = entry.display,
+                  lnum = entry.lnum,
+                }
+              end,
+            }),
+            sorter = require("telescope.sorters").get_generic_fuzzy_sorter(),
             attach_mappings = function(prompt_bufnr, map)
-              map("i", "<C-j>", require("telescope.actions").move_selection_next)
-              map("i", "<C-k>", require("telescope.actions").move_selection_previous)
+              local actions = require("telescope.actions")
+              local action_state = require("telescope.actions.state")
+              actions.select_default:replace(function()
+                actions.close(prompt_bufnr)
+                local selection = action_state.get_selected_entry()
+                if selection then
+                  vim.api.nvim_win_set_cursor(0, {selection.lnum, 0})
+                end
+              end)
+              map("i", "<C-j>", actions.move_selection_next)
+              map("i", "<C-k>", actions.move_selection_previous)
               return true
             end,
-          })
+          }):find()
         end, { buffer = true, desc = "Search Headings" })
 
         local function surround(prefix, suffix)
@@ -467,6 +507,8 @@ return {
           vim.notify("TOC generated", vim.log.levels.INFO)
         end, { buffer = true, desc = "Generate Table of Contents" })
 
+
+
         -- Keymap to show word/character count
         vim.keymap.set("n", "<leader>wc", function()
           local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -481,19 +523,7 @@ return {
           vim.notify(string.format("Words: %d, Characters: %d", words, chars), vim.log.levels.INFO)
         end, { buffer = true, desc = "Word/Character Count" })
 
-        -- Smart folding for Markdown
-        vim.opt_local.foldmethod = "expr"
-        vim.opt_local.foldexpr = "MarkdownFold()"
-        vim.opt_local.foldlevel = 1
 
-        function MarkdownFold()
-          local line = vim.fn.getline(vim.v.lnum)
-          local level = line:match("^(#+)")
-          if level then
-            return #level
-          end
-          return "="
-        end
 
         -- Auto-continue Markdown lists
         local function get_list_prefix(line)
