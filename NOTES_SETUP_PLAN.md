@@ -87,7 +87,7 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 
 ---
 
-## 8. Phase 8: Additional Quality-of-Life Improvements (Planned)
+## 8. Phase 8: Additional Quality-of-Life Improvements (Completed)
 
 **Objective:** Add final enhancements for writing, organization, and searching to polish the notes setup.
 
@@ -96,46 +96,140 @@ To create a powerful, reliable, and modular Neovim environment for note-taking a
 1. **Full-Text Search Across Vault**: Implemented a Telescope live_grep picker limited to the notes directory for searching note content (e.g., `<leader>fn` keymap).
 2. **Automatic Table of Contents (TOC)**: Implemented functionality to generate a TOC from headings in the current note (e.g., `<leader>toc` inserts a TOC section).
 3. **Note Templates Expansion**: Expanded to include meeting note template (via `<leader>yhm` keymap).
-4. **Smart Folding for Markdown**: Planned - Enable folding by heading levels for better navigation in long notes.
+4. **Smart Folding for Markdown**: Completed - Implemented comprehensive folding for YAML frontmatter, headers (by heading level), and nested lists/checkboxes for better navigation in long notes.
 5. **Improved Metadata Search**: Implemented sorting by updated date (newest first) and enhanced previews (show first 20 lines with truncation) in the metadata picker.
 6. **Auto-Formatting on Paste**: Automatically rewrap and format pasted text in Markdown files to maintain clean formatting.
 7. **Word/Character Count Display**: Implemented word/character count display (via `<leader>wc` keymap).
-8. **Pomodoro Integration with Checkboxes**: Integrate pomo.nvim to start 25m timers on checkbox lines (using sanitized text as title), manually append session markers (` | [*]`, ` | [**]`, etc.) via `<leader>pm` keymap, and provide short (5m) and long (10m) rest timers via `<leader>prs` and `<leader>prl`.
+8. **Pomodoro Integration with Checkboxes**: Integrate pomo.nvim to start 25m timers on checkbox lines (using sanitized text as title), manually append session markers (` | [*]`, ` | [**]`, etc.) via `<leader>tm` keymap, and provide short (5m) and long (10m) rest timers via `<leader>ts` and `<leader>tl`.
 
 ---
 
-## 9. Next Steps
+## 9. Phase 9: File Organization & Naming (Completed)
 
-This plan provides our roadmap. Most features are implemented. Focus on testing and any remaining user preferences.
+**Objective:** Implement automatic file naming convention based on YAML frontmatter for chronological sorting.
+
+**Action Steps:**
+
+1. **Automatic File Renaming**: Implemented auto-rename on first save for new markdown files based on YAML frontmatter (format: `YYYY-MM-DD-title-slug.md`).
+2. **Manual Rename Keymap**: Added `<leader>yr` keymap to manually rename existing files based on their YAML frontmatter.
+3. **Safe Rename Logic**: Implemented validation to prevent overwriting files, ensure required YAML fields exist, and use stable `created` date for filename.
+4. **Title Slug Generation**: Converts titles to URL-friendly format (lowercase, hyphens, no special characters).
 
 ---
 
-## 10. Keybindings Summary
+## 10. Phase 10: Pomodoro & Mac Reminders Integration (Completed)
 
-Here is a summary of the keybindings implemented so far:
+**Objective:** Enhance Pomodoro timer experience with completion chimes and integrate Mac Reminders for task management from within Neovim.
 
+**Action Steps:**
+
+1. **Pomodoro Completion Chime (Completed)**: Added audio feedback when Pomodoro timers complete.
+   - Work sessions (≥20 min): `Glass.aiff` sound
+   - Rest sessions (<20 min): `Purr.aiff` sound
+   - Uses system volume, no custom volume control
+   - Visual notifications with different messages for work/rest
+   - **File Modified**: `lua/plugins/base/pomonvim.lua`
+
+2. **Mac Reminders Integration (Completed)**: Create reminders directly from Markdown checkboxes.
+   - Annotation format: `@remind(date)` in checkbox text
+   - Supports formats: `YYYY-MM-DD`, `YYYY-MM-DD HH:MM`, `today`, `tomorrow`, `next week`
+   - Duplicate detection via YAML frontmatter tracking
+   - Single reminder creation: `<leader>rc`
+   - Bulk sync all reminders: `<leader>rs`
+   - Snippet: `remind` + Tab → `@remind(YYYY-MM-DD)`
+   - **Files Modified**: 
+     - `lua/plugins/notes_profile/markdown-enhancements.lua`
+     - `lua/plugins/notes_profile/snippets/markdown/links.lua`
+
+**Testing:**
+- Test file created at `/tmp/test_reminders.md`
+- Verify single reminder creation with `<leader>rc`
+- Verify duplicate detection prevents re-creating reminders
+- Verify bulk sync with `<leader>rs`
+- Check YAML frontmatter gets `synced_reminders` tracking section
+
+---
+
+## 11. Next Steps
+
+All major features have been implemented! The notes setup is now complete with:
+- ✅ Comprehensive markdown folding (YAML, headers, lists)
+- ✅ Automatic date-based file naming
+- ✅ Full Obsidian-style workflow
+- ✅ Task management and Pomodoro integration
+- ✅ Pomodoro completion chimes
+- ✅ Mac Reminders integration with duplicate detection
+
+Focus on using and refining your workflow. Consider:
+- Testing the Mac Reminders integration with real notes
+- Using Pomodoro timers with checkbox tasks
+- Testing the auto-rename feature on new notes
+- Organizing existing notes with `<leader>yr`
+- Using folding commands (`za`, `zM`, `zR`) for navigation
+- Exploring metadata search (`<leader>ys`) for note discovery
+
+**Potential Future Enhancements:**
+- Auto-sync reminders on save (if manual sync feels tedious)
+- Two-way sync (mark checkbox complete when reminder is done in Mac Reminders)
+- Custom reminder list selection
+
+---
+
+## 12. Keybindings Summary
+
+Here is a summary of the keybindings implemented:
+
+### Task Management
 - **`<leader>xt`**: Open Centralized TODOs View (via `trouble.nvim`)
+
+### Checkboxes & Lists
 - **`<leader>cx`**: Toggle Markdown Checkbox on current line
 - **`<leader>cm`**: Move completed Markdown Checkbox item to `## DONE` section
 - **`<leader>ci`**: Insert Markdown Checkbox on a new line below, with indentation, and enter insert mode
+
+### Navigation
 - **`<leader>sh`**: Search Headings in current Markdown file (via Telescope LSP Document Symbols)
+- **`<leader>fn`**: Full-text search across notes vault (via Telescope live_grep)
+- **`za`**: Toggle fold at cursor (YAML/header/list)
+- **`zo` / `zc`**: Open / Close fold
+- **`zR` / `zM`**: Open / Close ALL folds
+- **`zj` / `zk`**: Jump to next/previous fold
+
+### YAML Frontmatter
 - **`<leader>ym`**: Display YAML frontmatter metadata
 - **`<leader>yh`**: Insert YAML frontmatter manually
-- **`<leader>bl`**: Insert backlink to another Markdown file (via Telescope)
-- **`<leader>ys`**: YAML Search (search/filter notes by YAML fields using Telescope)
-- **`<leader>fn`**: Full-text search across notes vault (via Telescope live_grep)
-- **`<leader>toc`**: Generate Table of Contents from headings
-- **`<leader>wc`**: Show word/character count
 - **`<leader>yhm`**: Insert meeting note template
-- **`<leader>pt`**: Start Pomodoro timer on checkbox line
-- **`<leader>pm`**: Mark Pomodoro session on checkbox line
-- **`<leader>prs`**: Start short rest timer (5m)
-- **`<leader>prl`**: Start long rest timer (10m)
-- **`link` + `<Tab>`**: Insert Markdown Link `[text](url)` snippet (via `LuaSnip`)
-- **`table` + `<Tab>`**: Insert Markdown Table snippet (via `LuaSnip`)
+- **`<leader>ys`**: YAML Search (search/filter notes by YAML fields using Telescope)
+- **`<leader>yf`**: Toggle YAML frontmatter fold
+- **`<leader>yr`**: Rename file based on YAML frontmatter (format: YYYY-MM-DD-title.md)
+
+### Linking & Organization
+- **`<leader>bl`**: Insert backlink to another Markdown file (via Telescope)
+- **`<leader>toc`**: Generate Table of Contents from headings
+
+### Text Formatting
 - **`<leader>mb`**: Markdown Bold (`**text**`) - Normal/Visual mode
 - **`<leader>mi`**: Markdown Italic (`*text*`) - Normal/Visual mode
 - **`<leader>ms`**: Markdown Strikethrough (`~~text~~`) - Normal/Visual mode
 - **`<leader>mc`**: Markdown Inline Code (`` `text` ``) - Normal/Visual mode
 - **`<leader>mC`**: Markdown Code Block (` ``` `) - Normal/Visual mode
+
+### Utilities
+- **`<leader>wc`**: Show word/character count
+- **`<leader>p`**: Paste image from clipboard (saves to `assets/` directory)
+
+### Pomodoro Integration
+- **`<leader>tp`**: Start Pomodoro timer on checkbox line (25m) - plays Glass.aiff on completion
+- **`<leader>tm`**: Mark Pomodoro session on checkbox line
+- **`<leader>ts`**: Start short rest timer (5m) - plays Purr.aiff on completion
+- **`<leader>tl`**: Start long rest timer (10m) - plays Purr.aiff on completion
+
+### Mac Reminders Integration
+- **`<leader>rc`**: Create Mac reminder from current checkbox line with @remind() annotation
+- **`<leader>rs`**: Sync all checkboxes with @remind() annotations to Mac Reminders
+
+### Snippets
+- **`link` + `<Tab>`**: Insert Markdown Link `[text](url)` snippet (via `LuaSnip`)
+- **`meta` + `<Tab>`**: Insert Obsidian-style YAML frontmatter (via `LuaSnip`)
+- **`remind` + `<Tab>`**: Insert `@remind(YYYY-MM-DD)` annotation (via `LuaSnip`)
 

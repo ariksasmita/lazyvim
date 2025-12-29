@@ -52,5 +52,15 @@ return {
       i(0),
     }
   ),
+
+  -- Snippet for @remind() annotation
+  s(
+    { trig = "remind", name = "Remind Annotation" },
+    {
+      t("@remind("),
+      i(1, "YYYY-MM-DD"),
+      t(")"),
+    }
+  ),
 }
 

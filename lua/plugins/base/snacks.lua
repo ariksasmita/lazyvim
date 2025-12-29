@@ -4,7 +4,7 @@ return {
     "folke/snacks.nvim",
     opts = {
       image = {
-        enabled = true,
+        enabled = false, -- Disable snacks image rendering, use image.nvim instead
       },
       -- Configuration for the explorer
       picker = {
