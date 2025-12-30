@@ -2,16 +2,11 @@
 -- This file contains all custom functions, keymaps, and autocommands for an enhanced Markdown experience.
 
 return {
+  -- We declare a dependency on LuaSnip to ensure it's loaded before this config runs.
   "L3MON4D3/LuaSnip",
-  ft = "markdown",
-  dependencies = {
-    "nvim-treesitter/nvim-treesitter",
-  },
   config = function()
-    -- Try to load LuaSnip snippets with blink.cmp if available
-    local ok, blink_sources = pcall(require, "blink.cmp.sources")
-    if ok and blink_sources and blink_sources.luasnip then
-      blink_sources.luasnip.add_loader(function()
+    if package.loaded["blink.cmp"] then
+      require("blink.cmp.sources").luasnip.add_loader(function()
         require("luasnip.loaders.from_lua").load({
           paths = {
             vim.fn.stdpath("config") .. "/lua/plugins/notes_profile/snippets",
@@ -28,11 +23,9 @@ return {
 
     -- Global fold expression function for markdown (YAML, headers, and lists)
     _G.markdown_fold_expr = function()
-      -- Wrap in pcall to prevent treesitter errors from breaking fold
-      local ok, result = pcall(function()
-        local lnum = vim.v.lnum
-        local line = vim.fn.getline(lnum)
-        local next_line = vim.fn.getline(lnum + 1)
+      local lnum = vim.v.lnum
+      local line = vim.fn.getline(lnum)
+      local next_line = vim.fn.getline(lnum + 1)
       
       -- 1. YAML frontmatter folding
       local yaml_start = vim.b.yaml_start
@@ -108,23 +101,14 @@ return {
       end
       
       return "="
-      end)
-      
-      -- If pcall failed, return safe default
-      if not ok then
-        return "="
-      end
-      return result
     end
 
     -- Custom fold text for all markdown folds
     _G.markdown_fold_text = function()
-      -- Wrap in pcall to prevent errors
-      local ok, result = pcall(function()
-        local foldstart = vim.v.foldstart
-        local foldend = vim.v.foldend
-        local line = vim.fn.getline(foldstart)
-        local line_count = foldend - foldstart + 1
+      local foldstart = vim.v.foldstart
+      local foldend = vim.v.foldend
+      local line = vim.fn.getline(foldstart)
+      local line_count = foldend - foldstart + 1
       
       -- 1. YAML frontmatter
       if line:match("^%-%-%-$") and foldstart == 1 then
@@ -172,13 +156,6 @@ return {
         text = text .. "..."
       end
       return string.format("  %s  [%d lines]", text, line_count)
-      end)
-      
-      -- If pcall failed, return safe default
-      if not ok then
-        return "  Folded  [" .. (vim.v.foldend - vim.v.foldstart + 1) .. " lines]"
-      end
-      return result
     end
 
     -- Function to parse YAML frontmatter from current buffer
@@ -1189,29 +1166,12 @@ return {
           vim.b[buf].yaml_end = end_line
         end
         
-        
-        -- Enable folding for all markdown files (deferred to ensure treesitter is ready)
-        vim.defer_fn(function()
-          if vim.bo.filetype == "markdown" then
-            pcall(function()
-              vim.opt_local.foldmethod = "expr"
-              vim.opt_local.foldexpr = "v:lua.markdown_fold_expr()"
-              vim.opt_local.foldenable = true
-              vim.opt_local.foldlevel = 1  -- Start with level 1 folds open (YAML closed, headers open)
-              vim.opt_local.foldtext = "v:lua.markdown_fold_text()"
-            end)
-          end
-        end, 100)
-        
-        -- Manual keymap to enable folding (use <leader>mf to re-enable if needed)
-        vim.keymap.set("n", "<leader>mf", function()
-          vim.opt_local.foldmethod = "expr"
-          vim.opt_local.foldexpr = "v:lua.markdown_fold_expr()"
-          vim.opt_local.foldenable = true
-          vim.opt_local.foldlevel = 1
-          vim.opt_local.foldtext = "v:lua.markdown_fold_text()"
-          vim.notify("Markdown folding enabled", vim.log.levels.INFO)
-        end, { buffer = true, desc = "Enable Markdown Folding" })
+        -- Enable folding for all markdown files
+        vim.opt_local.foldmethod = "expr"
+        vim.opt_local.foldexpr = "v:lua.markdown_fold_expr()"
+        vim.opt_local.foldenable = true
+        vim.opt_local.foldlevel = 1  -- Start with level 1 folds open (YAML closed, headers open)
+        vim.opt_local.foldtext = "v:lua.markdown_fold_text()"
         
         -- Keymap to toggle YAML frontmatter fold (if exists)
         if start_line == 1 and end_line then
