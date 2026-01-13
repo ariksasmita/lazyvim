@@ -8,6 +8,18 @@ return {
     "nvim-treesitter/nvim-treesitter",
   },
   config = function()
+    -- Load checkbox-core module for multi-state checkbox support
+    local checkbox_core = require("notes_profile_modules.checkbox-core")
+
+    -- Initialize workspace management (Phase 12)
+    -- This restores the last workspace on startup
+    vim.schedule(function()
+      local workspace = require("notes_profile_modules.workspace")
+      if workspace.is_enabled() then
+        workspace.init()
+      end
+    end)
+
     -- Try to load LuaSnip snippets with blink.cmp if available
     local ok, blink_sources = pcall(require, "blink.cmp.sources")
     if ok and blink_sources and blink_sources.luasnip then
@@ -26,28 +38,31 @@ return {
       return #indent
     end
 
-    -- Global fold expression function for markdown (YAML, headers, and lists)
+    -- Global fold expression function for markdown (headers and lists only)
     _G.markdown_fold_expr = function()
       -- Wrap in pcall to prevent treesitter errors from breaking fold
       local ok, result = pcall(function()
         local lnum = vim.v.lnum
         local line = vim.fn.getline(lnum)
         local next_line = vim.fn.getline(lnum + 1)
-      
-      -- 1. YAML frontmatter folding
-      local yaml_start = vim.b.yaml_start
-      local yaml_end = vim.b.yaml_end
-      
-      if yaml_start and yaml_end then
-        if lnum == yaml_start then
-          return ">1"
-        elseif lnum > yaml_start and lnum < yaml_end then
-          return "1"
-        elseif lnum == yaml_end then
-          return "<1"
+
+        -- 1. YAML frontmatter folding - CONDITIONAL based on buffer variable
+        -- Only fold YAML if vim.b.yaml_fold_enabled is true
+        -- This allows markview to render YAML when not folded
+        local yaml_start = vim.b.yaml_start
+        local yaml_end = vim.b.yaml_end
+        local yaml_fold_enabled = vim.b.yaml_fold_enabled or false
+
+        if yaml_start and yaml_end and yaml_fold_enabled then
+          if lnum == yaml_start then
+            return ">1"
+          elseif lnum > yaml_start and lnum < yaml_end then
+            return "1"
+          elseif lnum == yaml_end then
+            return "<1"
+          end
         end
-      end
-      
+
       -- 2. Header-based folding
       local curr_heading = line:match("^(#+)%s+")
       local next_heading = next_line:match("^(#+)%s+")
@@ -154,10 +169,14 @@ return {
       -- 3. List items (including checkboxes)
       local checkbox = line:match("^%s*%- %[(.)%]%s+(.+)$")
       if checkbox then
-        local status = checkbox == "x" and "✓" or checkbox == " " and " " or checkbox
-        local text = line:match("^%s*%- %[.%]%s+(.+)$")
-        local indent = line:match("^(%s*)")
-        return string.format("%s[%s] %s  [%d lines]", indent, status, text, line_count)
+        local checkbox_core = require("notes_profile_modules.checkbox-core")
+        local state = checkbox_core.get_checkbox_state(checkbox)
+        local status = state.icon
+        table.insert(items, {
+          lnum = i,
+          kind = "checkbox",
+          text = status .. " " .. text,
+        })
       end
       
       local list_item = line:match("^%s*[%-%*%+]%s+(.+)$") or line:match("^%s*%d+%.%s+(.+)$")
@@ -644,95 +663,15 @@ return {
       }):find()
     end
 
+    -- Multi-state checkbox toggle using checkbox-core module
     local function toggle_checkbox()
-      local line = vim.api.nvim_get_current_line()
-      local lnum = vim.api.nvim_win_get_cursor(0)[1]
-
-      if line:match("%[x%]") then
-        local new_line = line:gsub("%[x%]", "[ ]", 1)
-        vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, { new_line })
-      elseif line:match("%[%s%]") then
-        local new_line = line:gsub("%[%s%]", "[x]", 1)
-        vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, { new_line })
-      end
+      checkbox_core.toggle_checkbox()
     end
 
+    -- Move checked items to DONE section using checkbox-core module
     local function move_checked_to_done()
-      local line = vim.api.nvim_get_current_line()
-      local lnum = vim.api.nvim_win_get_cursor(0)[1]
-
-      if not line:match("%[x%]") then
-        vim.notify("Current line is not a checked checkbox.", vim.log.levels.INFO)
-        return
+      checkbox_core.move_checked_to_done()
       end
-
-      local done_section_lnum = nil
-      local buffer_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-      for i, bline in ipairs(buffer_lines) do
-        if bline:match("^#+%s*DONE") then
-          done_section_lnum = i
-          break
-        end
-      end
-
-      if not done_section_lnum then
-        vim.notify("No '## DONE' section found in the file.", vim.log.levels.INFO)
-        return
-      end
-
-      -- Get the checkbox line and calculate its indentation
-      local checkbox_line = buffer_lines[lnum]
-      local checkbox_indent = checkbox_line:match("^(%s*)")
-      local checkbox_indent_len = #checkbox_indent
-      
-      -- Collect the checkbox line and all its child lines (with greater indentation)
-      local lines_to_move = { checkbox_line }
-      local end_line = lnum
-      
-      -- Look for child lines (lines with greater indentation than the checkbox)
-      for i = lnum + 1, #buffer_lines do
-        local next_line = buffer_lines[i]
-        
-        -- Empty lines are considered part of the block
-        if next_line:match("^%s*$") then
-          table.insert(lines_to_move, next_line)
-          end_line = i
-        else
-          -- Calculate indentation of the next line
-          local next_indent = next_line:match("^(%s*)")
-          local next_indent_len = #next_indent
-          
-          -- If next line has greater indentation, it's a child
-          if next_indent_len > checkbox_indent_len then
-            table.insert(lines_to_move, next_line)
-            end_line = i
-          else
-            -- Stop when we hit a line with same or less indentation
-            break
-          end
-        end
-      end
-
-      -- Remove the lines from their current position
-      vim.api.nvim_buf_set_lines(0, lnum - 1, end_line, false, {})
-      
-      -- Insert the lines after the DONE section header
-      -- Adjust done_section_lnum if it's after the deleted lines
-      local insert_pos = done_section_lnum
-      if done_section_lnum > lnum then
-        insert_pos = done_section_lnum - (end_line - lnum + 1)
-      end
-      
-      vim.api.nvim_buf_set_lines(0, insert_pos, insert_pos, false, lines_to_move)
-      
-      local item_count = #lines_to_move
-      if item_count == 1 then
-        vim.notify("Moved checked item to '## DONE' section.", vim.log.levels.INFO)
-      else
-        vim.notify(string.format("Moved checked item with %d child line(s) to '## DONE' section.", item_count - 1), vim.log.levels.INFO)
-      end
-    end
 
     -- Auto-update 'updated' field in YAML on save
     vim.api.nvim_create_autocmd("BufWritePre", {
@@ -1197,32 +1136,154 @@ return {
               vim.opt_local.foldmethod = "expr"
               vim.opt_local.foldexpr = "v:lua.markdown_fold_expr()"
               vim.opt_local.foldenable = true
-              vim.opt_local.foldlevel = 1  -- Start with level 1 folds open (YAML closed, headers open)
-              vim.opt_local.foldtext = "v:lua.markdown_fold_text()"
+              vim.opt_local.foldlevel = 0  -- All folds open initially
+              vim.opt_local.foldtext = "v:lua.require('notes_profile_modules.markdown-foldtext').markdown_foldtext()"
             end)
           end
         end, 100)
-        
+
         -- Manual keymap to enable folding (use <leader>mf to re-enable if needed)
         vim.keymap.set("n", "<leader>mf", function()
           vim.opt_local.foldmethod = "expr"
           vim.opt_local.foldexpr = "v:lua.markdown_fold_expr()"
           vim.opt_local.foldenable = true
-          vim.opt_local.foldlevel = 1
-          vim.opt_local.foldtext = "v:lua.markdown_fold_text()"
+          vim.opt_local.foldlevel = 0  -- All folds open initially
+          vim.opt_local.foldtext = "v:lua.require('notes_profile_modules.markdown-foldtext').markdown_foldtext()"
           vim.notify("Markdown folding enabled", vim.log.levels.INFO)
         end, { buffer = true, desc = "Enable Markdown Folding" })
-        
-        -- Keymap to toggle YAML frontmatter fold (if exists)
-        if start_line == 1 and end_line then
-          vim.keymap.set("n", "<leader>yf", function()
-            local cursor = vim.api.nvim_win_get_cursor(0)
-            vim.api.nvim_win_set_cursor(0, {1, 0})
-            vim.cmd("normal! za")
-            vim.api.nvim_win_set_cursor(0, cursor)
-          end, { buffer = true, desc = "Toggle YAML Frontmatter Fold" })
-        end
 
+        -- Keymap to open all folds
+        vim.keymap.set("n", "<leader>zR", function()
+          vim.cmd("normal! zR")
+          vim.notify("All folds opened", vim.log.levels.INFO)
+        end, { buffer = true, desc = "Open all folds" })
+
+        -- Keymap to toggle YAML frontmatter fold (always available, checks for YAML when pressed)
+        vim.keymap.set("n", "<leader>yf", function()
+          -- Detect YAML frontmatter on-demand
+          local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+          local yaml_start
+          local yaml_end
+
+          for i, line in ipairs(lines) do
+            if line == "---" then
+              if not yaml_start then
+                yaml_start = i
+              else
+                yaml_end = i
+                break
+              end
+            end
+          end
+
+          if not yaml_start or not yaml_end then
+            vim.notify("No YAML frontmatter found in this file", vim.log.levels.WARN)
+            return
+          end
+
+          -- Toggle the YAML fold enabled flag
+          vim.b.yaml_fold_enabled = not vim.b.yaml_fold_enabled
+
+          -- Check if YAML section is currently folded (before refresh)
+          local fold_start = yaml_start
+          local fold_info = vim.fn.foldclosed(fold_start)
+
+          -- Refresh folds to apply the change
+          vim.cmd("normal! zx")
+
+          -- Check the new state after refresh
+          local new_fold_info = vim.fn.foldclosed(fold_start)
+
+          if vim.b.yaml_fold_enabled then
+            if new_fold_info ~= -1 then
+              vim.notify("YAML frontmatter folded", vim.log.levels.INFO)
+            else
+              -- Fold didn't create, might need to close it manually
+              vim.cmd(fold_start .. "foldclose")
+              vim.notify("YAML frontmatter folded", vim.log.levels.INFO)
+            end
+          else
+            vim.notify("YAML frontmatter unfolded", vim.log.levels.INFO)
+          end
+        end, { buffer = true, desc = "Toggle YAML Frontmatter Fold" })
+
+        -- ============================================================================
+        -- WORKSPACE MANAGEMENT (Phase 12) - KEYBINDINGS
+        -- ============================================================================
+
+        local workspace = require("notes_profile_modules.workspace")
+
+        -- Show current workspace
+        vim.keymap.set("n", "<leader>ww", function()
+          if not workspace.is_enabled() then
+            vim.notify("Workspace management is disabled", vim.log.levels.WARN)
+            return
+          end
+
+          local active = workspace.get_active_workspace()
+          if active then
+            vim.notify("Current workspace: " .. active.display_name .. "\nPath: " .. active.path, vim.log.levels.INFO)
+          else
+            vim.notify("No active workspace", vim.log.levels.WARN)
+          end
+        end, { buffer = true, desc = "Show current workspace" })
+
+        -- Workspace picker (Telescope)
+        vim.keymap.set("n", "<leader>ws", function()
+          if not workspace.is_enabled() then
+            vim.notify("Workspace management is disabled", vim.log.levels.WARN)
+            return
+          end
+
+          local workspaces = workspace.list_workspaces()
+          if #workspaces == 0 then
+            vim.notify("No workspaces configured", vim.log.levels.WARN)
+            return
+          end
+
+          -- Try to use Telescope for picker (LazyVim has it)
+          local ok, pickers = pcall(require, "telescope.pickers")
+          local ok2, finders = pcall(require, "telescope.finders")
+          local ok3, actions_state = pcall(require, "telescope.actions.state")
+          local ok4, actions = pcall(require, "telescope.actions")
+
+          if ok and ok2 and ok3 and ok4 then
+            pickers.new({}, {
+              prompt_title = "Select Workspace",
+              finder = finders.new_table({
+                results = workspaces,
+                entry_maker = function(entry)
+                  return {
+                    value = entry.name,
+                    display = entry.display_name,
+                    ordinal = entry.display_name,
+                  }
+                end,
+              }),
+              attach_mappings = function(prompt_bufnr, map)
+                actions.select:replace(function()
+                  local selection = actions_state.get_selected_entry()
+                  if selection then
+                    workspace.set_workspace(selection.value)
+                  end
+                end)
+                return true
+              end,
+            }):find()
+          else
+            -- Fallback to vim.ui.select if Telescope not available
+            vim.ui.select(workspaces, {
+              prompt = "Select Workspace",
+              format_item = function(item)
+                return item.display_name
+              end,
+            }, function(choice)
+              if choice then
+                workspace.set_workspace(choice.name)
+              end
+            end)
+          end
+        end, { buffer = true, desc = "Switch workspace" })
 
       end,
     })
