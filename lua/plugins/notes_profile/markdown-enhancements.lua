@@ -737,6 +737,24 @@ return {
       callback = function(args)
         require("luasnip.loaders.from_lua").load({ paths = { vim.fn.stdpath("config") .. "/lua/plugins/notes_profile/snippets" } })
 
+        -- Detect YAML frontmatter on file load for fold expression
+        local lines = vim.api.nvim_buf_get_lines(0, 0, 50, false)
+        local yaml_start, yaml_end
+        for i, line in ipairs(lines) do
+          if line == "---" then
+            if not yaml_start then
+              yaml_start = i
+            else
+              yaml_end = i
+              break
+            end
+          end
+        end
+        if yaml_start and yaml_end then
+          vim.b.yaml_start = yaml_start
+          vim.b.yaml_end = yaml_end
+        end
+
         vim.keymap.set("n", "<leader>cx", toggle_checkbox, { buffer = true, desc = "Toggle Checkbox" })
         vim.keymap.set("n", "<leader>cm", move_checked_to_done, { buffer = true, desc = "Move Checked to DONE" })
 
@@ -852,8 +870,6 @@ return {
           local frontmatter = {
             "---",
             "title: " .. title,
-            "aliases:",
-            "  - ",
             "tags:",
             "  - ",
             "created: " .. now,
@@ -1160,6 +1176,12 @@ return {
 
         -- Keymap to toggle YAML frontmatter fold (always available, checks for YAML when pressed)
         vim.keymap.set("n", "<leader>yf", function()
+          -- Defensive check: ensure we're using expr foldmethod
+          if vim.opt_local.foldmethod:get() ~= "expr" then
+            vim.notify("Folding not enabled. Press <leader>mf> to enable folding first.", vim.log.levels.WARN)
+            return
+          end
+
           -- Detect YAML frontmatter on-demand
           local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
           local yaml_start
@@ -1181,31 +1203,109 @@ return {
             return
           end
 
-          -- Toggle the YAML fold enabled flag
-          vim.b.yaml_fold_enabled = not vim.b.yaml_fold_enabled
+          -- Save YAML positions for fold expression to use
+          vim.b.yaml_start = yaml_start
+          vim.b.yaml_end = yaml_end
 
-          -- Check if YAML section is currently folded (before refresh)
-          local fold_start = yaml_start
-          local fold_info = vim.fn.foldclosed(fold_start)
+          -- Toggle the YAML fold enabled flag
+          local was_enabled = vim.b.yaml_fold_enabled
+          vim.b.yaml_fold_enabled = not was_enabled
 
           -- Refresh folds to apply the change
+          -- The fold expression will handle creating/removing the fold based on the flag
           vim.cmd("normal! zx")
 
-          -- Check the new state after refresh
-          local new_fold_info = vim.fn.foldclosed(fold_start)
-
-          if vim.b.yaml_fold_enabled then
-            if new_fold_info ~= -1 then
-              vim.notify("YAML frontmatter folded", vim.log.levels.INFO)
-            else
-              -- Fold didn't create, might need to close it manually
-              vim.cmd(fold_start .. "foldclose")
-              vim.notify("YAML frontmatter folded", vim.log.levels.INFO)
-            end
+          -- Notify user of the new state
+          if not was_enabled then
+            vim.notify("YAML frontmatter fold enabled", vim.log.levels.INFO)
           else
-            vim.notify("YAML frontmatter unfolded", vim.log.levels.INFO)
+            vim.notify("YAML frontmatter fold disabled", vim.log.levels.INFO)
           end
         end, { buffer = true, desc = "Toggle YAML Frontmatter Fold" })
+
+        -- ============================================================================
+        -- LIST INDENTATION (Tab/Shift-Tab)
+        -- ============================================================================
+
+        -- Get the indent size (use shiftwidth or tabstop)
+        local get_indent_size = function()
+          return vim.bo.shiftwidth > 0 and vim.bo.shiftwidth or vim.bo.tabstop or 2
+        end
+
+        -- Check if current line is a list item
+        local is_list_item = function(line)
+          return line:match("^%s*[-*+]%s") or line:match("^%s*%d+%.%s")
+        end
+
+        -- Increase list item indentation (Tab)
+        local indent_list_item = function()
+          local line = vim.api.nvim_get_current_line()
+          if is_list_item(line) then
+            local indent_size = get_indent_size()
+            local current_indent = line:match("^(%s*)")
+            local new_line = string.rep(" ", #current_indent + indent_size) .. line:sub(#current_indent + 1)
+            vim.api.nvim_set_current_line(new_line)
+          else
+            -- Not a list item, use default tab behavior
+            return vim.api.nvim_replace_termcodes("<Tab>", true, true, true)
+          end
+        end
+
+        -- Decrease list item indentation (Shift+Tab)
+        local unindent_list_item = function()
+          local line = vim.api.nvim_get_current_line()
+          if is_list_item(line) then
+            local indent_size = get_indent_size()
+            local current_indent = line:match("^(%s*)")
+
+            if #current_indent >= indent_size then
+              local new_line = line:sub(#current_indent - indent_size + 1)
+              vim.api.nvim_set_current_line(new_line)
+            elseif #current_indent > 0 then
+              -- Partial indent, remove what we can
+              local new_line = line:sub(#current_indent + 1)
+              vim.api.nvim_set_current_line(new_line)
+            end
+          else
+            -- Not a list item, use default shift-tab behavior
+            return vim.api.nvim_replace_termcodes("<S-Tab>", true, true, true)
+          end
+        end
+
+        -- Tab in insert mode
+        vim.keymap.set("i", "<Tab>", function()
+          local line = vim.api.nvim_get_current_line()
+
+          -- Check if we're on a list item (before or after the marker)
+          if is_list_item(line) then
+            -- Use Ctrl-O to execute >> without leaving insert mode
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o>>>", true, false, true), "n", false)
+            return ""
+          end
+
+          -- Default tab behavior
+          return vim.api.nvim_replace_termcodes("<Tab>", true, true, true)
+        end, { buffer = true, expr = true, desc = "Indent list item or insert tab" })
+
+        -- Shift+Tab in insert mode
+        vim.keymap.set("i", "<S-Tab>", function()
+          local line = vim.api.nvim_get_current_line()
+
+          -- Check if we're on a list item
+          if is_list_item(line) then
+            local indent_size = get_indent_size()
+            local current_indent = line:match("^(%s*)")
+
+            if #current_indent >= indent_size or #current_indent > 0 then
+              -- Use Ctrl-O to execute << without leaving insert mode
+              vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o><<", true, false, true), "n", false)
+            end
+            return ""
+          end
+
+          -- Default shift-tab behavior
+          return vim.api.nvim_replace_termcodes("<S-Tab>", true, true, true)
+        end, { buffer = true, expr = true, desc = "Unindent list item or insert shift-tab" })
 
         -- ============================================================================
         -- WORKSPACE MANAGEMENT (Phase 12) - KEYBINDINGS

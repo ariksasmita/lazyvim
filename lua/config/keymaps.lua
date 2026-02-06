@@ -4,6 +4,10 @@
 
 local keymap = vim.keymap
 
+-- Map jk to Esc in insert mode (exit insert mode faster)
+keymap.set("i", "jk", "<Esc>", { desc = "Exit insert mode" })
+keymap.set("i", "kj", "<Esc>", { desc = "Exit insert mode" })
+
 -- Scrolling through Buffers
 -- USE CTRL-O CTRL-I instead
 keymap.set("n", "<Tab>", ":bnext!<CR>") -- go to next buffer

@@ -12,8 +12,9 @@ return {
       "markdown_inline",
       "python",
       "regex",
-      -- "vim",  -- Disabled due to query file bug with "tab" node
       "vimdoc",
+      "yaml",  -- Required for markview YAML frontmatter formatting
+      -- "vim",  -- Disabled due to query file bug with "tab" node
     })
     
     -- Disable auto-install to prevent Mason tree-sitter-cli errors

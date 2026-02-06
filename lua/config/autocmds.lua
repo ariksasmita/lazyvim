@@ -22,3 +22,15 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
+
+-- Setup local paste image keymap for markdown buffers
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    local paste_image = require("notes_profile_modules.local-paste-image")
+    vim.keymap.set({ "n" }, "<leader>p", paste_image.paste_image, {
+      desc = "Paste Image from Clipboard",
+      buffer = 0,
+    })
+  end,
+})

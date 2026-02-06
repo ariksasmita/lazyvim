@@ -1,6 +1,6 @@
--- lua/plugins/local-paste-image.lua
+-- lua/notes_profile_modules/local-paste-image.lua
 --
--- A custom, self-contained script to paste images from the clipboard into
+-- A custom module to paste images from the clipboard into
 -- markdown files. This script has no external GitHub dependencies.
 --
 -- REQUIRES: `pngpaste` command-line tool.
@@ -46,13 +46,14 @@ function M.paste_image()
   end
 
   -- 5. Use `sips` to resize, convert to JPG, and save to final destination
-      local sips_command = table.concat({
-      "sips",
-      "--setProperty format jpeg",
-      "--setProperty formatOptions 75", -- Set JPEG quality to 75%
-      vim.fn.shellescape(temp_png_path),
-      "--out " .. vim.fn.shellescape(final_file_path),
-    }, " ")  vim.fn.system(sips_command)
+  local sips_command = table.concat({
+    "sips",
+    "--setProperty format jpeg",
+    "--setProperty formatOptions 75", -- Set JPEG quality to 75%
+    vim.fn.shellescape(temp_png_path),
+    "--out " .. vim.fn.shellescape(final_file_path),
+  }, " ")
+  vim.fn.system(sips_command)
   vim.fn.delete(temp_png_path) -- Clean up the temporary file
 
   -- 6. Check result and insert markdown link
@@ -65,8 +66,4 @@ function M.paste_image()
   end
 end
 
--- Set up the keymap
-vim.keymap.set({ "n" }, "<leader>p", M.paste_image, { desc = "Paste Image from Clipboard (Local)" })
-
--- Return an empty table to be consistent with plugin structure, even though it's not a real plugin.
-return {}
+return M
