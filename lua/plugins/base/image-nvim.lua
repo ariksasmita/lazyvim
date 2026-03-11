@@ -1,6 +1,6 @@
 return {
   "3rd/image.nvim",
-  enabled = false,  -- START DISABLED - Test if it loads safely
+  -- enabled = false,  -- NOW ENABLED for image preview
   event = "VeryLazy",
   dependencies = {
     "nvim-treesitter/nvim-treesitter",

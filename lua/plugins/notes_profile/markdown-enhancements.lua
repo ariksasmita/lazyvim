@@ -751,6 +751,10 @@ return {
           vim.b.yaml_end = yaml_end
         end
 
+        -- Set custom spacing for better readability
+        -- Note: linespace doesn't work in most modern terminals (kitty, ghostty, etc.)
+        vim.opt.scrolloff = 10  -- Keep 10 lines visible above/below cursor for better context
+
         vim.keymap.set("n", "<leader>cx", toggle_checkbox, { buffer = true, desc = "Toggle Checkbox" })
         vim.keymap.set("n", "<leader>cm", move_checked_to_done, { buffer = true, desc = "Move Checked to DONE" })
 
