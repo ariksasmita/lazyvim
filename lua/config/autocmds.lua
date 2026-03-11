@@ -6,3 +6,33 @@
 --
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
+
+-- Disable LazyVim's default spell-checking for Markdown buffers, since we
+-- author notes in languages other than English.
+pcall(vim.api.nvim_del_augroup_by_name, "lazyvim_wrap_spell")
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "markdown", "text" },
+  callback = function(event)
+    vim.opt_local.spell = false
+
+    if vim.bo[event.buf].filetype == "markdown" then
+      vim.opt_local.conceallevel = 2
+      vim.opt_local.concealcursor = "nc"
+    end
+  end,
+})
+
+-- Setup local paste image keymap for markdown buffers
+-- NOTE: Disabled for now - requires notes_profile_modules/local-paste-image
+-- Re-enable this after migrating notes_profile_modules if needed
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = "markdown",
+--   callback = function()
+--     local paste_image = require("notes_profile_modules.local-paste-image")
+--     vim.keymap.set({ "n" }, "<leader>p", paste_image.paste_image, {
+--       desc = "Paste Image from Clipboard",
+--       buffer = 0,
+--     })
+--   end,
+-- })
