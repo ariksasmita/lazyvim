@@ -6,9 +6,25 @@ return {
       image = {
         enabled = false, -- Disable snacks image rendering, use image.nvim instead
       },
+      notifier = {
+        enabled = true, -- Enable snacks notifier (replaces noice.nvim)
+      },
       -- Configuration for the explorer
       picker = {
         sources = {
+          grep = {
+            -- Try using basic grep with ripgrep fallback
+            cmd = "rg",
+            args = {
+              "--color=never",
+              "--no-heading",
+              "--with-filename",
+              "--line-number",
+              "--column",
+              "--smart-case",
+              "--hidden",
+            },
+          },
           explorer = {
             actions = {
               copy_relative_path_cwd = {

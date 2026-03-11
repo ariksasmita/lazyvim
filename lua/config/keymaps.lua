@@ -5,6 +5,16 @@
 local keymap = vim.keymap
 
 -- Map jk to Esc in insert mode (exit insert mode faster)
+-- Exclude picker/telescope buffers to avoid interfering with navigation
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "TelescopePrompt",
+  callback = function()
+    -- Disable jk/kj in telescope
+    vim.keymap.set("i", "jk", "jk", { buffer = 0 })
+    vim.keymap.set("i", "kj", "kj", { buffer = 0 })
+  end,
+})
+
 keymap.set("i", "jk", "<Esc>", { desc = "Exit insert mode" })
 keymap.set("i", "kj", "<Esc>", { desc = "Exit insert mode" })
 

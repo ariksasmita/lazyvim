@@ -139,7 +139,7 @@
 
 ---
 
-### Issue 3: YAML Section Folding (2026-01-02)
+### Issue 3: YAML Section Folding (2026-01-02 to 2026-01-30)
 
 **Issue:** `<leader>yf` (toggle YAML fold) keybinding not working
 
@@ -153,15 +153,47 @@
 - Error: Command succeeded but fold didn't actually appear
 - Cause: When switching back to `foldmethod=expr`, manual folds are lost
 
-**Final Fix:** ✅ Fixed with conditional foldexpr approach
+**Third Attempt:** Conditional foldexpr approach (2026-01-02)
 - Added YAML folding back to `markdown_fold_expr()` function
 - Made it conditional based on `vim.b.yaml_fold_enabled` buffer variable
-- When `yaml_fold_enabled = true`: foldexpr folds YAML
-- When `yaml_fold_enabled = false` (default): foldexpr ignores YAML (allows markview rendering)
-- Keybinding toggles the variable and refreshes folds with `zx`
-- Location: `lua/plugins/notes_profile/markdown-enhancements.lua:40-55, 1148-1174`
+- Toggle function had complex logic trying to manually create folds
+- **Intermittent Issue:** Sometimes worked, sometimes failed with E350
+- **User Test Results:**
+  - Fresh file open → Press `<leader>yf>` → FAIL ❌
+  - Edit file → Wait → Press `<leader>yf>` → WORK ✅
+  - Switch buffers → Press `<leader>yf>` → WORK ✅
 
-**Status:** ✅ Fixed - ready to test
+**Root Cause of Intermittent Issue (2026-01-30):**
+- Toggle function tried to manually create folds with `vim.cmd(fold_start .. "," .. yaml_end .. "fold")`
+- This command ONLY works with `foldmethod=manual`, not `foldmethod=expr`
+- Race condition: sometimes fold state changed before manual fold command executed
+- Line 1228: `vim.cmd(fold_start .. "," .. yaml_end .. "fold")` caused E350 errors
+
+**Final Fix (2026-01-30):** ✅ **RESOLVED**
+- Removed ALL manual fold creation attempts from toggle function
+- Simplified logic to just toggle flag and let fold expression handle folding
+- Added defensive check for `foldmethod=expr` before attempting operations
+- New approach:
+  1. Check if `foldmethod=expr`, warn if not
+  2. Detect YAML boundaries
+  3. Toggle `vim.b.yaml_fold_enabled` flag
+  4. Refresh folds with `zx` (fold expression handles the rest)
+  5. Notify user of new state
+- Location: `lua/plugins/notes_profile/markdown-enhancements.lua:1179-1226`
+
+**Known Limitations:**
+- `zc` works to close YAML fold ✅
+- `zo` works to open YAML fold ✅
+- `za` sometimes fails with E350 (known limitation of `foldmethod=expr`)
+- User can work with this - prefers `zc`/`zo` over `za`
+
+**How to Use:**
+1. Press `<leader>yf>` to enable YAML folding capability
+2. Press `zc` to fold YAML section (cursor on YAML)
+3. Press `zo` to unfold YAML section
+4. Press `<leader>yf>` again to disable YAML folding (markview renders normally)
+
+**Status:** ✅ **FIXED** - Working consistently
 
 ---
 
@@ -197,10 +229,60 @@
 
 ---
 
+## New Feature: List Item Indentation with Tab/Shift-Tab (2026-01-13)
+
+**Status:** ✅ Implemented and tested - fully working
+
+**Description:**
+- Press `<Tab>` to increase indentation of list items
+- Press `<Shift+Tab>` to decrease indentation of list items
+- Works for all list types: `-`, `*`, `+`, and numbered lists (`1.`, `2.`, etc.)
+- Works in both Insert mode and Normal mode
+- Works regardless of cursor position (before or after the list marker)
+- Respects your `shiftwidth` setting (default 2 spaces)
+- Falls back to default tab behavior for non-list lines
+
+**Implementation Details:**
+- Location: `lua/plugins/notes_profile/markdown-enhancements.lua:1210-1292`
+- Uses `expr = true` for insert mode mappings to allow proper return values
+- Uses `<C-o>` to execute normal-mode indent commands without leaving insert mode
+- Detects list items with pattern: `^\s*[-*+]\s` or `^\s*\d+\.\s`
+- Indent size determined by `shiftwidth` or `tabstop` settings
+- Only mapped in Insert mode to avoid conflicts with other keybindings
+
+**How It Works:**
+1. **Tab in Insert mode**: Adds `shiftwidth` spaces before the list marker
+   - `- Item` → `  - Item` (indented by one level)
+2. **Shift+Tab in Insert mode**: Removes `shiftwidth` spaces from the beginning
+   - `  - Item` → `- Item` (unindented by one level)
+
+**Example Usage:**
+```markdown
+- Top level item
+  - Nested item (Tab once)
+    - Double nested (Tab twice)
+- Back to top level (Shift+Tab twice)
+```
+
+**Keybindings:**
+- Insert mode only: `<Tab>` and `<S-Tab>` (Shift+Tab)
+- Falls back to default Vim behavior for non-list lines
+- Note: Not mapped in Normal mode to avoid conflicts with other keybindings
+
+**Testing:**
+1. Create a list: `- Item 1`
+2. Enter Insert mode on the line
+3. Press `<Tab>` → should indent to `  - Item 1` (stays in insert mode)
+4. Press `<Shift+Tab>` → should unindent back to `- Item 1` (stays in insert mode)
+5. Try with numbered lists: `1. Item` → `  1. Item`
+
+---
+
 ## Summary of Current Status
 
 **Working ✅:**
 - 4-state checkboxes with icons: [ ] 󰄱, [-] 󰔛, [x] 󰄵, [_] 󰅰
+- List item indentation with Tab/Shift+Tab (works for -, *, +, and numbered lists)
 - Heading icons in closed folds
 - Foldtext function
 - Basic markdown folding (headers, lists)

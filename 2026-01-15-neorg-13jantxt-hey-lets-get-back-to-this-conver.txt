@@ -1,0 +1,782 @@
+
+╭─── Claude Code v2.0.76 ──────────────────────────────────────────────────────╮
+│                                    │ Tips for getting started                │
+│            Welcome back!           │ Run /init to create a CLAUDE.md file w… │
+│                                    │ ─────────────────────────────────────── │
+│             * ▐▛███▜▌ *            │ Recent activity                         │
+│            * ▝▜█████▛▘ *           │ No recent activity                      │
+│             *  ▘▘ ▝▝  *            │                                         │
+│                                    │                                         │
+│   Sonnet 4.5 · API Usage Billing   │                                         │
+│           ~/.config/nvim           │                                         │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+  /model to try Opus 4.5
+
+> @neorg-13jan.txt hey, lets get back to this conversation here 
+  ⎿  Read neorg-13jan.txt (2000+ lines)
+
+⏺ I can see the conversation history about implementing markdown folding features. Let me check the current state of the code to understand where we left off:
+
+⏺ Read(lua/plugins/notes_profile/markdown-enhancements.lua)
+  ⎿  Read 30 lines
+
+⏺ Read(PHASE_TRACKER.md)
+  ⎿  Read 50 lines
+
+⏺ I can see where we left off. Here's the current status:
+
+  ✅ What's Working:
+  - YAML frontmatter folding (toggle with <leader>yf>)
+  - Header-based folding (H1-H6)
+  - List item folding (including nested lists)
+  - 4-state checkboxes with icons
+  - Custom foldtext with heading icons
+
+  ❌ What Was Removed:
+  - Code block folding - removed due to complexity and reliability issues (code blocks inside lists, without language identifiers, etc.)
+
+  Current State:
+  - foldlevel = 0 (all folds open initially)
+  - Code blocks stay open (markview.nvim renders them nicely)
+  - YAML folding is conditional (doesn't interfere with markview)
+
+  What would you like to do next?
+
+  1. Commit the current changes - YAML folding fix and removal of code block folding
+  2. Try a different approach for code block folding (maybe with a different syntax?)
+  3. Move on to other features from your enhancement plan
+  4. Something else?
+
+  Let me know and I'll help you move forward quickly!
+
+> lets do 1 first 
+
+⏺ Bash(git status)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(git diff HEAD --stat)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(git log --oneline -5)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Task Output bb8455e
+  ⎿  (No content)
+
+⏺ Task Output b0846ad
+  ⎿  (No content)
+
+⏺ Task Output b35c897
+  ⎿  (No content)
+
+⏺ Bash(git status -s && echo "---DIFF-STAT---" && git diff --stat &&  timeout: 
+      echo "---LOG---" && git log --oneline -3)                       15s
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(sleep 2 && cat                                                  timeout: 
+      /tmp/claude/-Users-sasmitai--config-nvim/tasks/b0e72b8.output    5s
+      2>/dev/null)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(git add PHASE_TRACKER.md                                       timeout: 
+      lua/plugins/notes_profile/markdown-enhancements.lua && git      10s
+      status)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ I'm experiencing technical issues with the git commands returning output. Let me provide you with the manual steps to create the commit:
+
+  Step 1: Stage the changes
+  git add PHASE_TRACKER.md lua/plugins/notes_profile/markdown-enhancements.lua
+
+  Step 2: Create the commit
+  git commit -m "fix(notes): implement conditional YAML folding and remove code block folding
+
+  - Add conditional YAML folding to markdown_fold_expr()
+  - Only fold YAML when vim.b.yaml_fold_enabled is true
+  - Allows markview to render YAML when unfolded
+  - Fix <leader>yf keybinding to toggle YAML folds properly
+  - Remove code block folding (too complex/unreliable)
+  - Update PHASE_TRACKER.md with complete fix history and feature removal
+
+  Changes:
+  - lua/plugins/notes_profile/markdown-enhancements.lua: Conditional YAML folding
+  - PHASE_TRACKER.md: Updated with Issue 3 fix and code block removal
+
+  This fixes the YAML section folding functionality while maintaining
+  markview.nvim compatibility for YAML rendering. Code block folding
+  was removed due to conflicts with list folding and unreliable detection."
+
+  Alternative: Commit all current changes
+  If you want to commit everything (including session files):
+  git add -A
+  git commit -m "fix(notes): implement conditional YAML folding and remove code block folding
+
+  - Add conditional YAML folding to markdown_fold_expr()
+  - Remove code block folding due to complexity
+  - Update PHASE_TRACKER.md with complete history"
+
+  Would you like to run these commands manually, or should I try a different approach to create the commit automatically?
+
+> okay done. can we add some enhancement though. you know I have multi level
+ checkbox and list item. When I pressed tab or shift+tab on a list item, be 
+it before / after the "-" or "*", can we make it increase / decrease the 
+tab? 
+
+⏺ Great idea! Let's add Tab/Shift-Tab functionality for list items to increase/decrease indentation. I'll add this to your markdown enhancements.
+
+⏺ Read(lua/plugins/notes_profile/markdown-enhancements.lua)
+  ⎿  Read 93 lines
+
+⏺ Now let me add the Tab/Shift-Tab functionality for list items. I'll insert it right after the YAML folding keybinding:
+
+⏺ Update(lua/plugins/notes_profile/markdown-enhancements.lua)
+  ⎿  Added 98 lines                                                      
+      1208          end, { buffer = true, desc = "Toggle YAML Frontmatter
+             Fold" })
+      1209  
+      1210          -- ==================================================
+            ==========================
+      1211 +        -- LIST INDENTATION (Tab/Shift-Tab)                  
+      1212 +        -- ==================================================
+           +==========================                                   
+      1213 +                                                             
+      1214 +        -- Get the indent size (use shiftwidth or tabstop)   
+      1215 +        local get_indent_size = function()                   
+      1216 +          return vim.bo.shiftwidth > 0 and vim.bo.shiftwidth 
+           +or vim.bo.tabstop or 2                                       
+      1217 +        end                                                  
+      1218 +                                                             
+      1219 +        -- Check if current line is a list item              
+      1220 +        local is_list_item = function(line)                  
+      1221 +          return line:match("^%s*[-*+]%s") or line:match("^%s
+           +*%d+%.%s")                                                   
+      1222 +        end                                                  
+      1223 +                                                             
+      1224 +        -- Increase list item indentation (Tab)              
+      1225 +        local indent_list_item = function()                  
+      1226 +          local line = vim.api.nvim_get_current_line()       
+      1227 +          if is_list_item(line) then                         
+      1228 +            local indent_size = get_indent_size()            
+      1229 +            local current_indent = line:match("^(%s*)")      
+      1230 +            local new_line = string.rep(" ", #current_indent 
+           ++ indent_size) .. line:sub(#current_indent + 1)              
+      1231 +            vim.api.nvim_set_current_line(new_line)          
+      1232 +          else                                               
+      1233 +            -- Not a list item, use default tab behavior     
+      1234 +            return vim.api.nvim_replace_termcodes("<Tab>", tr
+           +ue, true, true)                                              
+      1235 +          end                                                
+      1236 +        end                                                  
+      1237 +                                                             
+      1238 +        -- Decrease list item indentation (Shift+Tab)        
+      1239 +        local unindent_list_item = function()                
+      1240 +          local line = vim.api.nvim_get_current_line()       
+      1241 +          if is_list_item(line) then                         
+      1242 +            local indent_size = get_indent_size()            
+      1243 +            local current_indent = line:match("^(%s*)")      
+      1244 +                                                             
+      1245 +            if #current_indent >= indent_size then           
+      1246 +              local new_line = line:sub(#current_indent - ind
+           +ent_size + 1)                                                
+      1247 +              vim.api.nvim_set_current_line(new_line)        
+      1248 +            elseif #current_indent > 0 then                  
+      1249 +              -- Partial indent, remove what we can          
+      1250 +              local new_line = line:sub(#current_indent + 1) 
+      1251 +              vim.api.nvim_set_current_line(new_line)        
+      1252 +            end                                              
+      1253 +          else                                               
+      1254 +            -- Not a list item, use default shift-tab behavio
+           +r                                                            
+      1255 +            return vim.api.nvim_replace_termcodes("<S-Tab>", 
+           +true, true, true)                                            
+      1256 +          end                                                
+      1257 +        end                                                  
+      1258 +                                                             
+      1259 +        -- Tab in insert mode                                
+      1260 +        vim.keymap.set("i", "<Tab>", function()              
+      1261 +          local line = vim.api.nvim_get_current_line()       
+      1262 +          local cursor_col = vim.api.nvim_win_get_cursor(0)[2
+           +]                                                            
+      1263 +                                                             
+      1264 +          -- Check if we're on a list item (before or after t
+           +he marker)                                                   
+      1265 +          if is_list_item(line) then                         
+      1266 +            return indent_list_item()                        
+      1267 +          end                                                
+      1268 +                                                             
+      1269 +          -- Default tab behavior                            
+      1270 +          return vim.api.nvim_replace_termcodes("<Tab>", true
+           +, true, true)                                                
+      1271 +        end, { buffer = true, expr = true, desc = "Indent lis
+           +t item or insert tab" })                                     
+      1272 +                                                             
+      1273 +        -- Shift+Tab in insert mode                          
+      1274 +        vim.keymap.set("i", "<S-Tab>", function()            
+      1275 +          local line = vim.api.nvim_get_current_line()       
+      1276 +                                                             
+      1277 +          -- Check if we're on a list item                   
+      1278 +          if is_list_item(line) then                         
+      1279 +            return unindent_list_item()                      
+      1280 +          end                                                
+      1281 +                                                             
+      1282 +          -- Default shift-tab behavior                      
+      1283 +          return vim.api.nvim_replace_termcodes("<S-Tab>", tr
+           +ue, true, true)                                              
+      1284 +        end, { buffer = true, expr = true, desc = "Unindent l
+           +ist item or insert shift-tab" })                             
+      1285 +                                                             
+      1286 +        -- Tab in normal mode                                
+      1287 +        vim.keymap.set("n", "<Tab>", function()              
+      1288 +          local line = vim.api.nvim_get_current_line()       
+      1289 +          if is_list_item(line) then                         
+      1290 +            indent_list_item()                               
+      1291 +          else                                               
+      1292 +            -- Default behavior: move to right or indent     
+      1293 +            vim.cmd("normal! >>")                            
+      1294 +          end                                                
+      1295 +        end, { buffer = true, desc = "Indent list item" })   
+      1296 +                                                             
+      1297 +        -- Shift+Tab in normal mode                          
+      1298 +        vim.keymap.set("n", "<S-Tab>", function()            
+      1299 +          local line = vim.api.nvim_get_current_line()       
+      1300 +          if is_list_item(line) then                         
+      1301 +            unindent_list_item()                             
+      1302 +          else                                               
+      1303 +            -- Default behavior: move to left or unindent    
+      1304 +            vim.cmd("normal! <<")                            
+      1305 +          end                                                
+      1306 +        end, { buffer = true, desc = "Unindent list item" }) 
+      1307 +                                                             
+      1308 +        -- ==================================================
+           +==========================                                   
+      1309          -- WORKSPACE MANAGEMENT (Phase 12) - KEYBINDINGS
+      1310          -- ==================================================
+            ==========================
+      1311  
+
+⏺ Perfect! Now let me update the PHASE_TRACKER.md to document this new feature:
+
+⏺ Read(PHASE_TRACKER.md)
+  ⎿  Read 30 lines
+
+⏺ Update(PHASE_TRACKER.md)
+  ⎿  Added 46 lines                                                      
+      197  
+      198  ---
+      199  
+      200 +## New Feature: List Item Indentation with Tab/Shift-Tab (2026
+          +-01-13)                                                       
+      201 +                                                              
+      202 +**Status:** ✅ Implemented and ready to test                  
+      203 +                                                              
+      204 +**Description:**                                              
+      205 +- Press `<Tab>` to increase indentation of list items         
+      206 +- Press `<Shift+Tab>` to decrease indentation of list items   
+      207 +- Works for all list types: `-`, `*`, `+`, and numbered lists 
+          +(`1.`, `2.`, etc.)                                            
+      208 +- Works in both Insert mode and Normal mode                   
+      209 +- Works regardless of cursor position (before or after the lis
+          +t marker)                                                     
+      210 +- Respects your `shiftwidth` setting (default 2 spaces)       
+      211 +- Falls back to default tab behavior for non-list lines       
+      212 +                                                              
+      213 +**Implementation Details:**                                   
+      214 +- Location: `lua/plugins/notes_profile/markdown-enhancements.l
+          +ua:1210-1306`                                                 
+      215 +- Uses `expr = true` for insert mode mappings to allow proper 
+          +return values                                                 
+      216 +- Detects list items with pattern: `^\s*[-*+]\s` or `^\s*\d+\.
+          +\s`                                                           
+      217 +- Indent size determined by `shiftwidth` or `tabstop` settings
+      218 +                                                              
+      219 +**How It Works:**                                             
+      220 +1. **Tab**: Adds `shiftwidth` spaces before the list marker   
+      221 +   - `- Item` → `  - Item` (indented by one level)            
+      222 +2. **Shift+Tab**: Removes `shiftwidth` spaces from the beginni
+          +ng                                                            
+      223 +   - `  - Item` → `- Item` (unindented by one level)          
+      224 +                                                              
+      225 +**Example Usage:**                                            
+      226 +```markdown                                                   
+      227 +- Top level item                                              
+      228 +  - Nested item (Tab once)                                    
+      229 +    - Double nested (Tab twice)                               
+      230 +- Back to top level (Shift+Tab twice)                         
+      231 +```                                                           
+      232 +                                                              
+      233 +**Keybindings:**                                              
+      234 +- Insert mode: `<Tab>` and `<S-Tab>` (Shift+Tab)              
+      235 +- Normal mode: `<Tab>` and `<S-Tab>` (Shift+Tab)              
+      236 +- Falls back to default Vim behavior for non-list lines       
+      237 +                                                              
+      238 +**Testing:**                                                  
+      239 +1. Create a list: `- Item 1`                                  
+      240 +2. Press `<Tab>` in Insert or Normal mode → should indent to `
+          +  - Item 1`                                                   
+      241 +3. Press `<Shift+Tab>` → should unindent back to `- Item 1`   
+      242 +4. Try with numbered lists: `1. Item` → `  1. Item`           
+      243 +                                                              
+      244 +---                                                           
+      245 +                                                              
+      246  ## Summary of Current Status
+      247  
+      248  **Working ✅:**
+
+⏺ Update(PHASE_TRACKER.md)
+  ⎿  Added 1 line                                                        
+      247  
+      248  **Working ✅:**
+      249  - 4-state checkboxes with icons: [ ] 󰄱, [-] 󰔛, [x] 󰄵, [_] 󰅰
+      250 +- List item indentation with Tab/Shift+Tab (works for -, *, +,
+          + and numbered lists)                                          
+      251  - Heading icons in closed folds
+      252  - Foldtext function
+      253  - Basic markdown folding (headers, lists)
+
+⏺ Perfect! ✅ I've added Tab/Shift-Tab functionality for list items. Here's what I implemented:
+
+  What's New:
+
+  Tab / Shift+Tab for List Indentation:
+  - Works in Insert mode and Normal mode
+  - Works for all list types:
+    - - (bullet lists)
+    - * (bullet lists)
+    - + (bullet lists)
+    - 1. 2. etc. (numbered lists)
+  - Works anywhere on the line (before or after the marker)
+  - Respects your shiftwidth setting (default 2 spaces)
+  - Falls back to normal tab behavior for non-list lines
+
+  How to Test:
+
+  1. Reload Neovim
+  2. Open a markdown file
+  3. Create a list item: - Item 1
+  4. Press <Tab> → becomes   - Item 1 (indented)
+  5. Press <Tab> again → becomes     - Item 1 (double indented)
+  6. Press <Shift+Tab> → unindents to   - Item 1
+  7. Press <Shift+Tab> again → unindents to - Item 1
+
+  Implementation:
+
+  - Location: lua/plugins/notes_profile/markdown-enhancements.lua:1210-1306
+  - Added to PHASE_TRACKER.md with documentation
+
+  Files modified:
+  - lua/plugins/notes_profile/markdown-enhancements.lua - Added list indentation logic
+  - PHASE_TRACKER.md - Documented the new feature
+
+  Ready to test! Let me know if it works as expected or if you need any adjustments.
+
+> normal mode works, insert mode got error though. I pressed tab in char 0
+
+E5108: Error executing lua: 
+...nvim/lua/plugins/notes_profile/markdown-enhancements.lua:1231: E565: Not 
+allowed to change text or change window
+stack traceback:
+    [C]: in function 'nvim_set_current_line'
+    ...nvim/lua/plugins/notes_profile/markdown-enhancements.lua:1231: in 
+function 'callback'
+    ...re/nvim/lazy/blink.cmp/lua/blink/cmp/keymap/fallback.lua:76: in 
+function <...re/nvim/lazy/blink.cmp/lua/blink/cmp/keymap/fallback.lua:64> 
+
+⏺ I see the issue! In Insert mode with expr = true, we can't directly modify the buffer with nvim_set_current_line. Let me fix this:
+
+⏺ Update(lua/plugins/notes_profile/markdown-enhancements.lua)
+  ⎿  Added 20 lines, removed 3 lines                                     
+      1259          -- Tab in insert mode
+      1260          vim.keymap.set("i", "<Tab>", function()
+      1261            local line = vim.api.nvim_get_current_line()
+      1262 -          local cursor_col = vim.api.nvim_win_get_cursor(0)[2
+           -]                                                            
+      1262  
+      1263            -- Check if we're on a list item (before or after t
+            he marker)
+      1264            if is_list_item(line) then
+      1266 -            return indent_list_item()                        
+      1265 +            -- Use feedkeys to modify the line in insert mode
+      1266 +            local indent_size = get_indent_size()            
+      1267 +            local current_indent = line:match("^(%s*)")      
+      1268 +            local new_indent = string.rep(" ", #current_inden
+           +t + indent_size)                                             
+      1269 +                                                             
+      1270 +            -- Go to start of line, enter normal mode, add in
+           +dent, return to insert mode                                  
+      1271 +            vim.api.nvim_feedkeys(vim.api.nvim_replace_termco
+           +des("<Esc>^0" .. new_indent .. "i", true, true, true), "n", f
+           +alse)                                                        
+      1272 +            return ""                                        
+      1273            end
+      1274  
+      1275            -- Default tab behavior
+     ...
+      1282  
+      1283            -- Check if we're on a list item
+      1284            if is_list_item(line) then
+      1279 -            return unindent_list_item()                      
+      1285 +            local indent_size = get_indent_size()            
+      1286 +            local current_indent = line:match("^(%s*)")      
+      1287 +                                                             
+      1288 +            if #current_indent >= indent_size then           
+      1289 +              -- Remove one indent level                     
+      1290 +              local new_indent = string.rep(" ", #current_ind
+           +ent - indent_size)                                           
+      1291 +              vim.api.nvim_feedkeys(vim.api.nvim_replace_term
+           +codes("<Esc>^0" .. new_indent .. "i", true, true, true), "n",
+           + false)                                                      
+      1292 +            elseif #current_indent > 0 then                  
+      1293 +              -- Remove partial indent                       
+      1294 +              vim.api.nvim_feedkeys(vim.api.nvim_replace_term
+           +codes("<Esc>^0i", true, true, true), "n", false)             
+      1295 +            end                                              
+      1296 +            return ""                                        
+      1297            end
+      1298  
+      1299            -- Default shift-tab behavior
+
+⏺ Perfect! I've fixed the insert mode issue. The problem was that we can't use nvim_set_current_line in Insert mode with expr = true.
+
+  What I changed:
+  - Insert mode now uses vim.api.nvim_feedkeys to simulate:
+    a. Exit insert mode (<Esc>)
+    b. Go to start of line (^0)
+    c. Insert the new indentation
+    d. Re-enter insert mode (i)
+
+  This approach works properly in Insert mode without the "not allowed to change text" error.
+
+  Test it again:
+  1. Reload Neovim
+  2. Create a list: - Item
+  3. In Insert mode, press <Tab> → should indent to   - Item
+  4. In Insert mode, press <Shift+Tab> → should unindent back to - Item
+
+  The normal mode behavior should still work as before. Let me know if it's working properly now!
+
+> no error, but it just moved the cursor from 
+
+{cursor}- itemlist
+
+to
+
+- {cursor}itemlist 
+
+⏺ I see the issue! The feedkeys sequence is wrong. Let me fix it to properly add indentation at the start of the line:
+
+⏺ Update(lua/plugins/notes_profile/markdown-enhancements.lua)
+  ⎿  Added 24 lines, removed 10 lines                                    
+      1262  
+      1263            -- Check if we're on a list item (before or after t
+            he marker)
+      1264            if is_list_item(line) then
+      1265 -            -- Use feedkeys to modify the line in insert mode
+      1266 -            local indent_size = get_indent_size()            
+      1267 -            local current_indent = line:match("^(%s*)")      
+      1268 -            local new_indent = string.rep(" ", #current_inden
+           -t + indent_size)                                             
+      1265 +            -- Save cursor position                          
+      1266 +            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+      1267  
+      1270 -            -- Go to start of line, enter normal mode, add in
+           -dent, return to insert mode                                  
+      1271 -            vim.api.nvim_feedkeys(vim.api.nvim_replace_termco
+           -des("<Esc>^0" .. new_indent .. "i", true, true, true), "n", f
+           -alse)                                                        
+      1268 +            -- Use >> to indent in normal mode               
+      1269 +            vim.api.nvim_feedkeys(                           
+      1270 +              vim.api.nvim_replace_termcodes("<Esc>>>", true,
+           + true, true) ..                                              
+      1271 +              string.rep("<Right>", cursor_pos[2] + get_inden
+           +t_size()) ..                                                 
+      1272 +              "a",                                           
+      1273 +              "n", false                                     
+      1274 +            )                                                
+      1275              return ""
+      1276            end
+      1277  
+     ...
+      1287            if is_list_item(line) then
+      1288              local indent_size = get_indent_size()
+      1289              local current_indent = line:match("^(%s*)")
+      1290 +            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+      1291  
+      1292              if #current_indent >= indent_size then
+      1289 -              -- Remove one indent level                     
+      1290 -              local new_indent = string.rep(" ", #current_ind
+           -ent - indent_size)                                           
+      1291 -              vim.api.nvim_feedkeys(vim.api.nvim_replace_term
+           -codes("<Esc>^0" .. new_indent .. "i", true, true, true), "n",
+           - false)                                                      
+      1293 +              -- Use << to unindent in normal mode           
+      1294 +              local new_col = cursor_pos[2] - indent_size    
+      1295 +              vim.api.nvim_feedkeys(                         
+      1296 +                vim.api.nvim_replace_termcodes("<Esc><<", tru
+           +e, true, true) ..                                            
+      1297 +                string.rep("<Right>", new_col) ..            
+      1298 +                "a",                                         
+      1299 +                "n", false                                   
+      1300 +              )                                              
+      1301              elseif #current_indent > 0 then
+      1302                -- Remove partial indent
+      1294 -              vim.api.nvim_feedkeys(vim.api.nvim_replace_term
+           -codes("<Esc>^0i", true, true, true), "n", false)             
+      1303 +              vim.api.nvim_feedkeys(                         
+      1304 +                vim.api.nvim_replace_termcodes("<Esc>0i", tru
+           +e, true, true) ..                                            
+      1305 +                string.rep("<Right>", cursor_pos[2] - #curren
+           +t_indent) ..                                                 
+      1306 +                "a",                                         
+      1307 +                "n", false                                   
+      1308 +              )                                              
+      1309              end
+      1310              return ""
+      1311            end
+
+⏺ I've fixed it! Now the code uses Vim's built-in >> and << commands which properly handle indentation.
+
+  What changed:
+  - Tab: Exits insert mode → uses >> to indent → moves cursor to correct position (accounting for new indent) → re-enters insert mode
+  - Shift+Tab: Exits insert mode → uses << to unindent → moves cursor to correct position → re-enters insert mode
+
+  Test again:
+  1. Reload Neovim
+  2. Create: - item|
+  3. Press <Tab> → should become   - item|
+  4. Press <Shift+Tab> → should become - item|
+
+  The cursor position should be maintained correctly now. Let me know if it works!
+
+> do we need to escape on each run? insert mode should stay in insert mode 
+
+⏺ You're absolutely right! Let me fix this to stay in insert mode without the mode flashing. I'll use Ctrl-O to execute normal-mode commands without fully exiting insert mode:
+
+⏺ Update(lua/plugins/notes_profile/markdown-enhancements.lua)
+  ⎿  Added 5 lines, removed 28 lines                                     
+      1262  
+      1263            -- Check if we're on a list item (before or after t
+            he marker)
+      1264            if is_list_item(line) then
+      1265 -            -- Save cursor position                          
+      1266 -            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+      1267 -                                                             
+      1268 -            -- Use >> to indent in normal mode               
+      1269 -            vim.api.nvim_feedkeys(                           
+      1270 -              vim.api.nvim_replace_termcodes("<Esc>>>", true,
+           - true, true) ..                                              
+      1271 -              string.rep("<Right>", cursor_pos[2] + get_inden
+           -t_size()) ..                                                 
+      1272 -              "a",                                           
+      1273 -              "n", false                                     
+      1274 -            )                                                
+      1265 +            -- Use Ctrl-O to execute >> without leaving inser
+           +t mode                                                       
+      1266 +            vim.api.nvim_feedkeys(vim.api.nvim_replace_termco
+           +des("<C-o>>>", true, false, true), "n", false)               
+      1267              return ""
+      1268            end
+      1269  
+     ...
+      1279            if is_list_item(line) then
+      1280              local indent_size = get_indent_size()
+      1281              local current_indent = line:match("^(%s*)")
+      1290 -            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+      1282  
+      1292 -            if #current_indent >= indent_size then           
+      1293 -              -- Use << to unindent in normal mode           
+      1294 -              local new_col = cursor_pos[2] - indent_size    
+      1295 -              vim.api.nvim_feedkeys(                         
+      1296 -                vim.api.nvim_replace_termcodes("<Esc><<", tru
+           -e, true, true) ..                                            
+      1297 -                string.rep("<Right>", new_col) ..            
+      1298 -                "a",                                         
+      1299 -                "n", false                                   
+      1300 -              )                                              
+      1301 -            elseif #current_indent > 0 then                  
+      1302 -              -- Remove partial indent                       
+      1303 -              vim.api.nvim_feedkeys(                         
+      1304 -                vim.api.nvim_replace_termcodes("<Esc>0i", tru
+           -e, true, true) ..                                            
+      1305 -                string.rep("<Right>", cursor_pos[2] - #curren
+           -t_indent) ..                                                 
+      1306 -                "a",                                         
+      1307 -                "n", false                                   
+      1308 -              )                                              
+      1283 +            if #current_indent >= indent_size or #current_ind
+           +ent > 0 then                                                 
+      1284 +              -- Use Ctrl-O to execute << without leaving ins
+           +ert mode                                                     
+      1285 +              vim.api.nvim_feedkeys(vim.api.nvim_replace_term
+           +codes("<C-o><<", true, false, true), "n", false)             
+      1286              end
+      1287              return ""
+      1288            end
+
+⏺ Perfect! Now it uses Ctrl-O which executes a single normal-mode command and automatically returns to insert mode. No mode flashing!
+
+  What changed:
+  - <C-o>>> - Execute >> (indent) and stay in insert mode
+  - <C-o><< - Execute << (unindent) and stay in insert mode
+
+  This is much cleaner - the cursor position is handled automatically by the >> and << commands.
+
+  Test again:
+  1. Reload Neovim
+  2. In Insert mode on a list item: - item|
+  3. Press <Tab> → should smoothly become   - item| (stays in insert mode)
+  4. Press <Shift+Tab> → should smoothly become - item| (stays in insert mode)
+
+  No more mode switching!
+
+> thanks, update the lof 
+  ⎿  Interrupted · What should Claude do instead?
+
+> thanks, update the log 
+
+⏺ Update(PHASE_TRACKER.md)
+  ⎿  Added 1 line, removed 1 line                                        
+      199  
+      200  ## New Feature: List Item Indentation with Tab/Shift-Tab (2026
+           -01-13)
+      201  
+      202 -**Status:** ✅ Implemented and ready to test                  
+      202 +**Status:** ✅ Implemented and tested - fully working         
+      203  
+      204  **Description:**
+      205  - Press `<Tab>` to increase indentation of list items
+
+⏺ Done! Updated the status to "✅ Implemented and tested - fully working" in PHASE_TRACKER.md.
+
+  Summary of what's working:
+  - ✅ List indentation with Tab/Shift-Tab
+  - ✅ Works in Insert mode (using Ctrl-O to stay in insert mode)
+  - ✅ Works in Normal mode
+  - ✅ Works for all list types: -, *, +, and numbered lists
+  - ✅ Respects shiftwidth setting
+  - ✅ Falls back to default tab behavior for non-list lines
+
+  Ready to move on to the next enhancement or commit these changes!
+
+> Oh I got one issue: I use tab to cycle over active buffers in normal mode.
+ Above's improvements seems to override that. Can we only keep the insert 
+mode mapping? 
+
+⏺ Update(lua/plugins/notes_profile/markdown-enhancements.lua)
+  ⎿  Removed 22 lines                                                    
+      1291            return vim.api.nvim_replace_termcodes("<S-Tab>", tr
+            ue, true, true)
+      1292          end, { buffer = true, expr = true, desc = "Unindent l
+            ist item or insert shift-tab" })
+      1293  
+      1294 -        -- Tab in normal mode                                
+      1295 -        vim.keymap.set("n", "<Tab>", function()              
+      1296 -          local line = vim.api.nvim_get_current_line()       
+      1297 -          if is_list_item(line) then                         
+      1298 -            indent_list_item()                               
+      1299 -          else                                               
+      1300 -            -- Default behavior: move to right or indent     
+      1301 -            vim.cmd("normal! >>")                            
+      1302 -          end                                                
+      1303 -        end, { buffer = true, desc = "Indent list item" })   
+      1304 -                                                             
+      1305 -        -- Shift+Tab in normal mode                          
+      1306 -        vim.keymap.set("n", "<S-Tab>", function()            
+      1307 -          local line = vim.api.nvim_get_current_line()       
+      1308 -          if is_list_item(line) then                         
+      1309 -            unindent_list_item()                             
+      1310 -          else                                               
+      1311 -            -- Default behavior: move to left or unindent    
+      1312 -            vim.cmd("normal! <<")                            
+      1313 -          end                                                
+      1314 -        end, { buffer = true, desc = "Unindent list item" }) 
+      1315 -                                                             
+      1294          -- ==================================================
+            ==========================
+      1295          -- WORKSPACE MANAGEMENT (Phase 12) - KEYBINDINGS
+      1296          -- ==================================================
+            ==========================
+
+⏺ Done! Removed the Normal mode mappings. Now Tab/Shift-Tab for list indentation only works in Insert mode, so it won't interfere with your buffer cycling in Normal mode.
+
+⏺ Update(PHASE_TRACKER.md)
+  ⎿  Added 5 lines, removed 3 lines                                      
+      211  - Falls back to default tab behavior for non-list lines
+      212  
+      213  **Implementation Details:**
+      214 -- Location: `lua/plugins/notes_profile/markdown-enhancements.l
+          -ua:1210-1306`                                                 
+      214 +- Location: `lua/plugins/notes_profile/markdown-enhancements.l
+          +ua:1210-1292`                                                 
+      215  - Uses `expr = true` for insert mode mappings to allow proper 
+           return values
+      216 +- Uses `<C-o>` to execute normal-mode indent commands without 
+          +leaving insert mode                                           
+      217  - Detects list items with pattern: `^\s*[-*+]\s` or `^\s*\d+\.
+           \s`
+      218  - Indent size determined by `shiftwidth` or `tabstop` settings
+      219 +- Only mapped in Insert mode to avoid conflicts with other key
+          +bindings                                                      
+      220  
+      221  **How It Works:**
+      220 -1. **Tab**: Adds `shiftwidth` spaces before the list marker   
+      222 +1. **Tab in Insert mode**: Adds `shiftwidth` spaces before the
+          + list marker                                                  
+      223     - `- Item` → `  - Item` (indented by one level)
+      222 -2. **Shift+Tab**: Removes `shiftwidth` spaces from the beginni
+          -ng                                                            
+      224 +2. **Shift+Tab in Insert mode**: Removes `shiftwidth` spaces f
+          +rom the beginning                                             
+      225     - `  - Item` → `- Item` (unindented by one level)
+      226  
+      227  **Example Usage:**
+
+⏺ Update(PHASE_TRACKER.md)
+  ⎿  Added 2 lines, removed 2 lines                                      
+      233  ```
+      234  
+      235  **Keybindings:**
+      236 -- Insert mode: `<Tab>` and `<S-Tab>` (Shift+Tab)              
+      237 -- Normal mode: `<Tab>` and `<S-Tab>` (Shift+Tab)              
+      236 +- Insert mode only: `<Tab>` and `<S-Tab>` (Shift+Tab)         
+      237  - Falls back to default Vim behavior for non-list lines
+      238 +- Note: Not mapped in Normal mode to avoid conflicts with othe
+          +r keybindings                                                 
+      239  
+      240  **Testing:**
+      241  1. Create a list: `- Item 1`
+
+⏺ Update(PHASE_TRACKER.md)
+  ⎿  Added 4 lines, removed 3 lines                                      
+      239  
+      240  **Testing:**
+      241  1. Create a list: `- Item 1`
+      242 -2. Press `<Tab>` in Insert or Normal mode → should indent to `
+          -  - Item 1`                                                   
+      243 -3. Press `<Shift+Tab>` → should unindent back to `- Item 1`   
+      244 -4. Try with numbered lists: `1. Item` → `  1. Item`           
+      242 +2. Enter Insert mode on the line                              
+      243 +3. Press `<Tab>` → should indent to `  - Item 1` (stays in ins
+          +ert mode)                                                     
+      244 +4. Press `<Shift+Tab>` → should unindent back to `- Item 1` (s
+          +tays in insert mode)                                          
+      245 +5. Try with numbered lists: `1. Item` → `  1. Item`           
+      246  
+      247  ---
+      248  
+
+⏺ Perfect! ✅
+
+  Changes made:
+  - Removed Normal mode Tab/Shift-Tab mappings
+  - Kept only Insert mode mappings
+  - Updated documentation in PHASE_TRACKER.md
+
+  Now:
+  - ✅ Insert mode: Tab/Shift-Tab indents/unindents list items
+  - ✅ Normal mode: Tab cycles through buffers (your original behavior)
+
+  Your buffer cycling should work fine now!
+
+
+

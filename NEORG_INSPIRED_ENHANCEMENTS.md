@@ -643,18 +643,18 @@ When user presses `<leader>ws`:
 
 ```
 ┌─ Select Workspace ──────────────────────────────────────┐
-│ > work                                                   │
-│   * ~/Library/.../notevault (142 notes)                │
-│                                                          │
-│   test                                                   │
-│     /tmp/neorg-test-vault (3 notes)                    │
-│                                                          │
-│   personal                                               │
+│ > work                                                  │
+│   * ~/Library/.../notevault (142 notes)                 │
+│                                                         │
+│   test                                                  │
+│     /tmp/neorg-test-vault (3 notes)                     │
+│                                                         │
+│   personal                                              │
 │     ~/notes/personal (not created)                      │
-│                                                          │
-│   archive                                                │
+│                                                         │
+│   archive                                               │
 │     ~/notes/archive (87 notes)                          │
-└──────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────┘
 ```
 
 ### Integration with Existing Features

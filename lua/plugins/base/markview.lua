@@ -208,6 +208,31 @@ return {
               virt_text = { { config.text or "", utils.set_hl(config.hl) } }
             })
 
+            -- Add borders for multi-line properties
+            for l = item.range.row_start + 1, item.range.row_end do
+              local border, border_hl
+
+              if l == item.range.row_end and config.border_bottom then
+                border = config.border_bottom
+                border_hl = config.border_bottom_hl or config.border_hl or config.hl
+              elseif l == item.range.row_start + 1 and config.border_top then
+                border = config.border_top
+                border_hl = config.border_top_hl or config.border_hl or config.hl
+              elseif config.border_middle then
+                border = config.border_middle
+                border_hl = config.border_middle_hl or config.border_hl or config.hl
+              else
+                border_hl = config.border_hl or config.hl
+              end
+
+              if border or border_hl then
+                vim.api.nvim_buf_set_extmark(buffer, ns, l, math.min(item.range.col_start, #item.text[(l - item.range.row_start) + 1]), {
+                  virt_text_pos = "inline",
+                  virt_text = { { border or "", utils.set_hl(border_hl) } }
+                })
+              end
+            end
+
             -- For list-type properties, replace "-" bullets with icons
             if item.type == "list" then
               local property_icons = {
@@ -238,7 +263,12 @@ return {
 
         -- Custom icons and styling for common YAML properties
         properties = {
-          -- Basic metadata
+          default = {
+            use_types = false,  -- Don't use data type icons by default
+            border_middle = "│ ",
+            border_hl = "MarkviewYamlBorder",
+          },
+
           title = {
             use_types = false,  -- Don't use data type icons, use this property's icon
             text = ' 󰉼 ',
@@ -345,15 +375,14 @@ return {
             hl = 'MarkviewYamlSpecial',
           },
         },
-
-        -- Scope decoration (visual styling around properties)
-        use_separator = true,
       },
 
       -- Custom highlight groups (matching your colorscheme)
       highlight_groups = {
-        -- These will automatically adapt to your colorscheme
-        -- Markview creates dynamic palettes
+        MarkviewYamlBorder = {
+          fg = "Special",
+          italic = true,
+        },
       },
     }
   end,

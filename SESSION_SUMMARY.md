@@ -85,6 +85,50 @@ This section details the challenges we faced and how they were addressed.
 
 ---
 
+### 2.7 Modular Refactoring (Phase 0 - 2026-01-01)
+
+* **Goal:** Refactor monolithic configuration into modular architecture for better maintainability.
+* **Problem:**
+  * Original `markdown-enhancements.lua` was becoming too large
+  * "Invalid plugin spec" errors due to lazy.nvim auto-detecting non-plugin modules
+  * `local-paste-image.lua` was a dummy plugin causing warnings
+* **Implementation:**
+  * Created `lua/notes_profile_modules/` for shared modules (not auto-detected by lazy.nvim)
+  * Extracted modules:
+    * `config.lua` - Workspace paths, checkbox states, time tracking config
+    * `checkbox-core.lua` - Checkbox management (toggle, move to done, insert)
+    * `reminders.lua` - Mac Reminders integration
+    * `navigation.lua` - Workspace navigation and search functions
+    * `local-paste-image.lua` - Image pasting functionality
+  * Moved `local-paste-image.lua` from `lua/plugins/` to `lua/notes_profile_modules/`
+  * Added autocmd in `lua/config/autocmds.lua` to load paste image keymap only for markdown buffers
+  * Updated all `require()` statements to use new paths
+* **Architecture:**
+  ```
+  lua/plugins/notes_profile/       ← Auto-detected by lazy.nvim
+    ├── conform.lua                 ← Plugin spec
+    ├── headlines.lua               ← Plugin spec
+    ├── markdown-enhancements.lua   ← Plugin spec
+    ├── marksman-lint-config.lua    ← Plugin spec
+    └── trouble.lua                 ← Plugin spec
+
+  lua/notes_profile_modules/        ← Manual require() only
+    ├── config.lua                  ← Configuration
+    ├── checkbox-core.lua           ← Checkbox functions
+    ├── reminders.lua               ← Reminders integration
+    ├── navigation.lua              ← Navigation functions
+    └── local-paste-image.lua       ← Image pasting
+  ```
+* **Benefits:**
+  * ✅ No more "Invalid plugin spec" errors
+  * ✅ Clean separation: plugins = external, modules = internal code
+  * ✅ Better code organization
+  * ✅ Easier to maintain and extend
+* **Status:** **Complete.**
+* **Next:** Phase 11 - Multi-State Checkbox Cycle implementation
+
+---
+
 ## 3. Future Setup Plan
 
 A detailed plan, `NOTES_SETUP_PLAN.md`, has been created to guide the future development of the Neovim note-taking and task management setup.
@@ -96,5 +140,262 @@ A detailed plan, `NOTES_SETUP_PLAN.md`, has been created to guide the future dev
     *   Phase 2: Core Note-Taking Features (Telescope, Marksman LSP, `headlines.nvim`, `local-paste-image.lua`).
     *   Phase 3: Task Management (`todo-tree.nvim`).
 *   **Current Status:** Ready to begin Phase 1.
+
+---
+
+# NEORG-INSPIRED ENHANCEMENTS PROJECT
+
+**Project Start:** December 30, 2025
+**Branch:** `feature/neorg-enhancements`
+**Documentation:** `NEORG_INSPIRED_ENHANCEMENTS.md` (comprehensive plan), `PHASE_TRACKER.md` (working status)
+
+## Project Overview
+
+**Goal:** Integrate Neorg's best features into existing Markdown-based note-taking system while maintaining universal `.md` format compatibility.
+
+**Philosophy:**
+- Keep Markdown format (universal compatibility)
+- Enhance, don't replace existing workflows
+- Modular design (each feature independently toggleable)
+- Future-proof for multi-workspace, multi-platform usage
+
+**Planned Phases:**
+- Phase 0: Path Refactoring & Modular Split ✅
+- Phase 11: Multi-State Checkbox System ✅
+- Phase 12: Workspace Management (Pending)
+- Phase 13: Time Tracking Enhancement (Pending)
+- Phase 14: Export System (Pending)
+- Phase 15: Advanced Text Objects (Pending)
+- Phase 16: Enhanced Analytics (Pending)
+
+---
+
+## Phase 0: Modular Refactoring (COMPLETED ✅)
+
+**Date:** 2026-01-01
+
+**What Was Done:**
+- Split 1,230-line monolithic `markdown-enhancements.lua` into modular architecture
+- Created `lua/notes_profile_modules/` for shared modules (not auto-detected by lazy.nvim)
+- Extracted hardcoded OneDrive paths to centralized config
+
+**New Architecture:**
+```
+lua/plugins/notes_profile/       ← Auto-detected by lazy.nvim (external plugins)
+├── conform.lua                 ← Plugin spec
+├── headlines.lua               ← Plugin spec
+├── markdown-enhancements.lua   ← Plugin spec (refactored, ~400 lines)
+├── marksman-lint-config.lua    ← Plugin spec
+└── trouble.lua                 ← Plugin spec
+
+lua/notes_profile_modules/        ← Manual require() only (internal modules)
+├── config.lua                  ← Configuration, paths, constants
+├── checkbox-core.lua           ← Checkbox functions
+├── reminders.lua               ← Mac Reminders integration
+├── navigation.lua              ← Navigation functions
+└── local-paste-image.lua       ← Image pasting
+```
+
+**Benefits:**
+- ✅ No more "Invalid plugin spec" errors
+- ✅ Clean separation: plugins = external, modules = internal
+- ✅ Better code organization and maintainability
+- ✅ Foundation ready for future enhancements
+
+---
+
+## Phase 11: Multi-State Checkbox System (COMPLETED ✅)
+
+**Date:** 2026-01-02 to 2026-01-13
+
+**What Was Done:**
+
+### 1. Implemented 4-State Checkbox System
+- **States:** `[ ]` Pending, `[-]` In Progress, `[x]` Done, `[_]` Cancelled
+- **NerdFont Icons:** 󰄱, 󰔛, 󰄵, 󰅰
+- **Cycling:** Forward (`[ ]` → `[-]` → `[x]` → `[_]` → `[ ]`) and backward
+
+### 2. Plugin Migration: render-markdown.nvim → markview.nvim
+**Why:** render-markdown.nvim couldn't natively support `[_]` cancelled state
+
+**Benefits of markview.nvim:**
+- Native support for all 4 checkbox states
+- Proper highlight groups for each state
+- Hybrid editing mode (edit while previewing)
+- Split view support
+- Better configuration flexibility
+
+**Files Changed:**
+- `lua/plugins/base/markview.lua` (NEW - replaced render-markdown.lua)
+- `lua/plugins/base/render-markdown.lua.disabled` (old plugin, disabled)
+- `lua/plugins/base/render-markdown.lua.backup` (backup saved)
+
+### 3. YAML Folding Implementation (Journey)
+
+**Initial Attempt:**
+- Implemented comprehensive folding: YAML frontmatter + Headers + Lists + Code blocks
+- Used `foldmethod = "expr"` with custom `markdown_fold_expr()` function
+- Custom foldtext to show state icons and heading levels
+
+**Problem Discovered:**
+- Code block folding conflicted with list folding (code blocks inside lists)
+- Lists without language identifiers (e.g., `    code` instead of ```` ```text ````) were unreliable
+- Complex logic made folding fragile
+
+**Solution:**
+- ✅ **Kept:** YAML frontmatter folding (conditional, with `<leader>yf>` toggle)
+- ✅ **Kept:** Header-based folding (H1-H6 with proper nesting)
+- ✅ **Kept:** List item folding (nested/indented items)
+- ❌ **Removed:** Code block folding (too complex, markview renders them nicely anyway)
+
+**Final YAML Folding Implementation:**
+- Conditional folding using `vim.b.yaml_fold_enabled` flag
+- Only folds when enabled (allows markview to render YAML when unfolded)
+- Toggle with `<leader>yf>` keybinding
+- Foldtext shows: `YAML Frontmatter: [title]  [X lines]`
+
+### 4. List Indentation Feature (2026-01-13)
+
+**What Was Added:**
+- Tab/Shift-Tab to increase/decrease list item indentation
+- Works in **Insert mode only** (Normal mode intentionally removed to preserve buffer cycling)
+- Uses `<C-o>>>` and `<C-o><<` for smooth indentation without mode switching
+- Supports: `-`, `*`, `+`, and numbered lists (`1.`, `2.`, etc.)
+
+**Keybindings:**
+- Insert mode: `<Tab>` (indent), `<S-Tab>` (unindent)
+- Respects `shiftwidth` setting (default 2 spaces)
+
+**Usage:**
+```
+- Top level item
+  - Nested item (Tab once)
+    - Double nested (Tab twice)
+- Back to top level (Shift+Tab twice)
+```
+
+**File Modified:** `lua/plugins/notes_profile/markdown-enhancements.lua:1210-1292`
+
+---
+
+## YAML Folding & Formatting Issues (OFF-TOPIC EXPLORATION)
+
+### Issue 1: Treesitter Crash (December 30, 2025)
+
+**Problem:**
+- Neovim crashed when pressing `:` (command mode)
+- Error: `Query error at 113:4. Invalid node type "tab"`
+
+**Root Causes:**
+1. **Missing `tree-sitter-cli`:** LazyVim update added requirement for tree-sitter-cli, but Mason couldn't install it
+2. **Broken Query File:** nvim-treesitter's vim query file referenced invalid "tab" node type
+
+**Solution:**
+1. Installed `tree-sitter-cli` via Homebrew:
+   ```bash
+   brew install tree-sitter-cli
+   ```
+2. Patched query file at `~/.local/share/nvim/lazy/nvim-treesitter/runtime/queries/vim/highlights.scm:113`
+3. Updated config: `lua/plugins/base/treesitter.lua`
+   - Added `auto_install = false`
+   - Added `highlight.disable = { "vim" }`
+
+**Status:** ✅ **RESOLVED**
+
+**Warning:** Query file patch will be overwritten if you run `:Lazy update` or `:TSUpdate`
+
+**Documentation:** `TROUBLESHOOTING_LOG.md`
+
+### Issue 2: YAML Frontmatter Not Formatting (Current - 2026-01-02)
+
+**Status:** ⚠️ **KNOWN ISSUE**
+
+**Problem:**
+- markview.nvim YAML configuration added but icons not displaying in frontmatter
+- YAML section shows as plain text without special formatting
+
+**Current Workaround:**
+- Conditional YAML folding allows markview to render YAML when unfolded
+- Toggle with `<leader>yf>` to fold/unfold
+
+**Potential Fixes to Explore:**
+1. Check markview.nvim YAML configuration syntax
+2. Verify conceallevel settings for markdown
+3. Test different YAML display modes in markview
+4. Consider alternative YAML formatting plugins
+5. Custom syntax highlighting for YAML frontmatter
+
+### Issue 3: YAML Folding Intermittent Failure (2026-01-30) ✅ FIXED
+
+**Problem:**
+- `<leader>yf>` toggle keybinding intermittently failed with `E350: Cannot create fold with current 'foldmethod'`
+- Happened inconsistently: fresh file open → fail, after editing/switching → work
+
+**Root Cause:**
+- Toggle function tried to manually create folds with `vim.cmd(fold_start .. "," .. yaml_end .. "fold")`
+- This command ONLY works with `foldmethod=manual`, not `foldmethod=expr`
+- Line 1228 attempted manual fold creation, incompatible with expression-based folding
+
+**Solution Implemented:**
+1. Removed ALL manual fold creation attempts from toggle function
+2. Simplified to just toggle `vim.b.yaml_fold_enabled` flag
+3. Let fold expression handle actual fold creation
+4. Added defensive check for `foldmethod=expr`
+5. Clear user notifications about state changes
+
+**File Modified:** `lua/plugins/notes_profile/markdown-enhancements.lua:1179-1226`
+
+**Known Limitations:**
+- `zc` (close) and `zo` (open) work perfectly ✅
+- `za` (toggle) sometimes fails with E350 - known limitation of `foldmethod=expr`
+- User prefers using `zc`/`zo` over `za` anyway
+
+**Status:** ✅ **RESOLVED** - Working consistently across all scenarios
+
+---
+
+## Current Status (January 30, 2026)
+
+### ✅ Working Features
+1. **4-State Checkboxes** with NerdFont icons (markview.nvim)
+2. **List Indentation** with Tab/Shift-Tab (Insert mode only)
+3. **Heading Icons** in closed folds
+4. **YAML Frontmatter Folding** (conditional, toggleable) - ✅ **FIXED** (2026-01-30)
+5. **Header-Based Folding** (H1-H6 with proper nesting)
+6. **List Item Folding** (nested/indented items)
+7. **Modular Architecture** (clean separation of concerns)
+
+### ⚠️ Known Issues
+1. **YAML Frontmatter Formatting** - icons not displaying in markview (pending)
+2. **Treesitter Query File** - patch may be overwritten by updates
+3. **`za` command limitation** - sometimes fails with E350 (known `foldmethod=expr` limitation)
+
+### 📋 Next Steps
+1. **Fix YAML Frontmatter Formatting** (current exploration - markview icons not displaying)
+2. **Phase 12: Workspace Management** (multi-workspace support)
+3. **Phase 13+:** Time tracking, export system, text objects, analytics
+
+### 📁 Key Documentation Files
+- **NEORG_INSPIRED_ENHANCEMENTS.md** - Comprehensive plan (all phases, detailed specs)
+- **PHASE_TRACKER.md** - Working status, recent issues, feature tracking
+- **TROUBLESHOOTING_LOG.md** - Treesitter crash resolution
+- **SESSION_SUMMARY.md** - This file (overall project summary)
+
+### 🎯 Key Files Modified
+- `lua/plugins/base/markview.lua` - New markdown rendering
+- `lua/plugins/notes_profile/markdown-enhancements.lua` - Main enhancements (folding, indentation)
+- `lua/plugins/base/treesitter.lua` - Treesitter configuration (vim disabled)
+- `lua/notes_profile_modules/config.lua` - Centralized configuration
+- `lua/notes_profile_modules/checkbox-core.lua` - Checkbox functions
+
+---
+
+## Commit History (Recent)
+
+- `e6af88d` - fix(notes): implement conditional YAML folding and remove code block folding
+- `177160a` - docs: add phase tracker for session management
+- `0777acc` - docs: create comprehensive Neorg-inspired enhancements plan
+- `f293663` - feat(ui): add breadcrumbs to winbar and improve config
+- `8c95ad3` - feat(notes): add Pomodoro chimes, Mac Reminders integration, and image rendering
 
 ---

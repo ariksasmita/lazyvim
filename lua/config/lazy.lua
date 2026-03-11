@@ -37,7 +37,12 @@ require("lazy").setup({
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
-  }, -- automatically check for plugin updates
+  },
+  -- Disable auto-reload on config change (causes crashes)
+  change_detection = {
+    enabled = false,
+    notify = false,
+  },
   performance = {
     rtp = {
       -- disable some rtp plugins

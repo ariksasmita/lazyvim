@@ -161,7 +161,7 @@ All major features have been implemented! The notes setup is now complete with:
 - ✅ Mac Reminders integration with duplicate detection
 
 Focus on using and refining your workflow. Consider:
-- Testing the Mac Reminders integration with real notes
+- Testing the Mac Reminders integration wite real notes
 - Using Pomodoro timers with checkbox tasks
 - Testing the auto-rename feature on new notes
 - Organizing existing notes with `<leader>yr`
@@ -172,6 +172,10 @@ Focus on using and refining your workflow. Consider:
 - Auto-sync reminders on save (if manual sync feels tedious)
 - Two-way sync (mark checkbox complete when reminder is done in Mac Reminders)
 - Custom reminder list selection
+
+**Own Improvements:**
+- Code Snippet Folding: make it work properly with triple backticks
+- Tab/Shift+Tab on list item should indent/unindent the item, not inputting tab character
 
 ---
 
