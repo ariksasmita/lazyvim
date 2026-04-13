@@ -755,6 +755,10 @@ return {
         -- Note: linespace doesn't work in most modern terminals (kitty, ghostty, etc.)
         vim.opt.scrolloff = 10  -- Keep 10 lines visible above/below cursor for better context
 
+        -- Hide line numbers for cleaner markdown viewing
+        vim.opt_local.number = false
+        vim.opt_local.relativenumber = false
+
         vim.keymap.set("n", "<leader>cx", toggle_checkbox, { buffer = true, desc = "Toggle Checkbox" })
         vim.keymap.set("n", "<leader>cm", move_checked_to_done, { buffer = true, desc = "Move Checked to DONE" })
 
@@ -1027,6 +1031,12 @@ return {
           vim.cmd("TimerStart 10m Rest")
           vim.notify("Started 10m Rest", vim.log.levels.INFO)
         end, { buffer = true, desc = "Start Long Rest Timer" })
+
+        -- Keymap to paste image from clipboard
+        vim.keymap.set("n", "<leader>p", function()
+          local paste_image = require("notes_profile_modules.local-paste-image")
+          paste_image.paste_image()
+        end, { buffer = true, desc = "Paste Image from Clipboard" })
 
         -- Keymap to generate Table of Contents
         vim.keymap.set("n", "<leader>toc", function()

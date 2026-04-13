@@ -59,7 +59,7 @@ function M.paste_image()
   -- 6. Check result and insert markdown link
   if vim.v.shell_error == 0 then
     local relative_path = "assets/" .. final_file_name
-    local markdown_link = "![](" .. relative_path .. ")"
+    local markdown_link = "![image](" .. relative_path .. ")"
     vim.api.nvim_put({ markdown_link }, "c", true, true)
   else
     vim.notify("Error: Failed to process image with `sips`.", vim.log.levels.ERROR)

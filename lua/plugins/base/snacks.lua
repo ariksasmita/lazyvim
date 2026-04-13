@@ -9,6 +9,10 @@ return {
       notifier = {
         enabled = true, -- Enable snacks notifier (replaces noice.nvim)
       },
+      terminal = {
+        -- Use fish shell instead of bash
+        shell = "/opt/homebrew/bin/fish",
+      },
       -- Configuration for the explorer
       picker = {
         sources = {

@@ -32,6 +32,10 @@ end, { desc = "Terminal vertical split" })
 vim.keymap.set("n", "<leader>th", function()
   require("snacks.terminal")(nil, { win = { position = "bottom" }})
 end, { desc = "Terminal horizontal split" })
+-- Ctrl-\ for quick horizontal terminal toggle
+vim.keymap.set("n", "<C-\\>", function()
+  require("snacks.terminal")(nil, { win = { position = "bottom" }})
+end, { desc = "Terminal horizontal split (quick)" })
 -- Terminal selector
 vim.keymap.set("n", "<leader>ts", "<cmd>TermSelect<cr>", { desc = "Select terminal" })
 
